@@ -1,0 +1,9 @@
+.git
+.next
+node_modules
+.env*
+!.env.example
+.agentdocs/workflow/done
+playwright-report
+test-results
+npm-debug.log*

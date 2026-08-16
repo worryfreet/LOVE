@@ -1,0 +1,402 @@
+.love-letter-reader {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(20px, 5vw, 64px);
+  color: #4f302b;
+  background:
+    radial-gradient(circle at 50% 44%, rgb(254 226 205 / 34%), transparent 30%),
+    linear-gradient(160deg, rgb(24 12 15 / 84%), rgb(11 17 16 / 94%));
+  backdrop-filter: blur(13px) saturate(0.72);
+  animation: love-letter-veil-in 650ms ease-out both;
+}
+
+.love-letter-reader::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(112deg, rgb(255 255 255 / 1.8%) 0 1px, transparent 1px 11px),
+    radial-gradient(circle at 50% 120%, rgb(196 104 105 / 16%), transparent 46%);
+  mix-blend-mode: screen;
+}
+
+.love-letter-reader__close {
+  position: absolute;
+  z-index: 5;
+  top: clamp(18px, 3vw, 34px);
+  right: clamp(18px, 3vw, 34px);
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgb(255 240 226 / 30%);
+  border-radius: 50%;
+  color: #fff1e5;
+  background: rgb(35 19 21 / 48%);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.love-letter-reader__close:hover {
+  border-color: rgb(255 220 208 / 70%);
+  background: rgb(133 67 75 / 48%);
+  transform: rotate(5deg);
+}
+
+.love-letter-reader__close:focus-visible,
+.love-letter-paper__keep:focus-visible {
+  outline: 2px solid #ffd1c8;
+  outline-offset: 4px;
+}
+
+.love-letter-reader__stage {
+  position: relative;
+  width: min(700px, 92vw);
+  max-height: min(840px, calc(100dvh - 50px));
+  perspective: 1400px;
+}
+
+.love-letter-reader__envelope {
+  position: absolute;
+  z-index: -1;
+  right: -7%;
+  bottom: -3%;
+  width: 64%;
+  aspect-ratio: 1.52;
+  border-radius: 4px 4px 12px 12px;
+  background: linear-gradient(145deg, #d8b687, #ba8f62);
+  box-shadow: 0 28px 80px rgb(0 0 0 / 38%);
+  opacity: 0;
+  transform: translate3d(0, 40px, -70px) rotate(8deg);
+  animation: love-letter-envelope-settle 1.2s 450ms ease-out both;
+}
+
+.love-letter-reader__envelope::before,
+.love-letter-reader__envelope::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  clip-path: polygon(0 0, 50% 62%, 100% 0, 100% 100%, 0 100%);
+  background: linear-gradient(155deg, rgb(250 226 186 / 68%), rgb(181 135 88 / 42%));
+}
+
+.love-letter-reader__envelope::after {
+  clip-path: polygon(0 100%, 50% 43%, 100% 100%);
+  background: rgb(206 167 117 / 78%);
+}
+
+.love-letter-reader__envelope span {
+  position: absolute;
+  z-index: 2;
+  top: 48%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  border-radius: 48% 52% 45% 55%;
+  background: radial-gradient(circle at 35% 30%, #d9828c, #873c4a 72%);
+  box-shadow: inset 1px 2px 5px rgb(255 226 221 / 30%);
+  transform: translate(-50%, -50%);
+}
+
+.love-letter-paper {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  max-height: min(820px, calc(100dvh - 54px));
+  flex-direction: column;
+  overflow: hidden;
+  padding: clamp(34px, 6.5vw, 68px) clamp(30px, 8vw, 84px) clamp(30px, 5vw, 54px);
+  border: 1px solid rgb(116 76 51 / 22%);
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, transparent 0 49.7%, rgb(119 78 54 / 8%) 50%, transparent 50.3%),
+    linear-gradient(180deg, transparent 0 32.9%, rgb(119 78 54 / 7%) 33.1%, transparent 33.3% 66.2%, rgb(119 78 54 / 7%) 66.4%, transparent 66.6%),
+    #f6e8ce;
+  box-shadow:
+    0 40px 100px rgb(0 0 0 / 45%),
+    0 3px 0 rgb(255 255 255 / 50%) inset,
+    0 -2px 8px rgb(112 71 45 / 10%) inset;
+  transform-origin: 50% 50%;
+  animation: love-letter-paper-unfold 1.65s cubic-bezier(0.22, 0.78, 0.18, 1) both;
+}
+
+.love-letter-paper::before,
+.love-letter-paper::after {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  content: '';
+  pointer-events: none;
+  border: 1px solid rgb(148 82 83 / 17%);
+  transform: rotate(45deg);
+}
+
+.love-letter-paper::before {
+  top: -84px;
+  left: -84px;
+}
+
+.love-letter-paper::after {
+  right: -84px;
+  bottom: -84px;
+}
+
+.love-letter-paper__fiber {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background:
+    repeating-linear-gradient(8deg, transparent 0 5px, rgb(97 62 40 / 3%) 5px 6px),
+    repeating-linear-gradient(97deg, transparent 0 9px, rgb(255 255 255 / 8%) 9px 10px);
+  mix-blend-mode: multiply;
+}
+
+.love-letter-paper header,
+.love-letter-paper__body,
+.love-letter-paper__keep {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: love-letter-ink-appear 850ms 1.05s ease-out forwards;
+}
+
+.love-letter-paper header {
+  flex: none;
+  text-align: center;
+}
+
+.love-letter-paper header > span {
+  display: block;
+  margin-bottom: 4px;
+  color: #a14e59;
+  font-size: 25px;
+}
+
+.love-letter-paper header p {
+  margin: 0 0 8px;
+  color: #a47d67;
+  font: 600 9px/1.2 'SFMono-Regular', Consolas, monospace;
+  letter-spacing: 0.28em;
+}
+
+.love-letter-paper h2 {
+  margin: 0 0 clamp(20px, 4vw, 34px);
+  color: #653a36;
+  font: 500 clamp(25px, 4.5vw, 38px)/1.25 'STKaiti', 'KaiTi', 'Songti SC', serif;
+  letter-spacing: 0.08em;
+}
+
+.love-letter-paper__body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 8px 6px 2px;
+  scrollbar-color: rgb(157 94 94 / 38%) transparent;
+  scrollbar-width: thin;
+}
+
+.love-letter-paper__body > p {
+  margin: 0 0 0.82em;
+  color: #543833;
+  font: 500 clamp(15px, 2.2vw, 17px)/1.86 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  letter-spacing: 0.075em;
+  text-align: justify;
+}
+
+.love-letter-paper__body > .love-letter-paper__salutation {
+  margin-bottom: 0.9em;
+  font-family: 'STKaiti', 'KaiTi', serif;
+  font-size: clamp(17px, 2.5vw, 20px);
+  text-align: left;
+}
+
+.love-letter-paper footer {
+  display: grid;
+  justify-items: end;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgb(126 77 62 / 14%);
+  color: #70473f;
+}
+
+.love-letter-paper footer span {
+  margin-bottom: 8px;
+  color: #987363;
+  font: 500 10px/1.4 'Songti SC', serif;
+  letter-spacing: 0.12em;
+}
+
+.love-letter-paper footer strong {
+  font: 500 clamp(18px, 3vw, 23px)/1.4 'STKaiti', 'KaiTi', serif;
+}
+
+.love-letter-paper footer i {
+  margin-top: 5px;
+  color: #aa5963;
+  font-style: normal;
+}
+
+.love-letter-paper__keep {
+  align-self: center;
+  min-width: 138px;
+  min-height: 38px;
+  flex: none;
+  margin-top: clamp(18px, 4vw, 30px);
+  padding: 0 20px;
+  border: 1px solid rgb(129 62 69 / 38%);
+  border-radius: 999px;
+  color: #774149;
+  background: rgb(255 251 240 / 34%);
+  font: 600 12px/1 'Songti SC', serif;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.love-letter-paper__keep:hover {
+  color: #fff8ed;
+  background: #98515c;
+  transform: translateY(-1px);
+}
+
+.love-letter-reader__ambient i {
+  position: absolute;
+  color: rgb(245 177 179 / 54%);
+  font-style: normal;
+  animation: love-letter-heart-float 5.2s ease-in-out infinite;
+}
+
+.love-letter-reader__ambient i:nth-child(1) { top: 16%; left: 13%; font-size: 12px; animation-delay: -1s; }
+.love-letter-reader__ambient i:nth-child(2) { top: 74%; left: 18%; font-size: 9px; animation-delay: -3s; }
+.love-letter-reader__ambient i:nth-child(3) { top: 24%; right: 15%; font-size: 8px; animation-delay: -2s; }
+.love-letter-reader__ambient i:nth-child(4) { right: 11%; bottom: 17%; font-size: 15px; animation-delay: -4s; }
+.love-letter-reader__ambient i:nth-child(5) { top: 9%; left: 42%; font-size: 7px; animation-delay: -2.5s; }
+
+@keyframes love-letter-veil-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes love-letter-paper-unfold {
+  0% { opacity: 0; clip-path: inset(44% 3% 44%); transform: translateY(80px) rotateX(-72deg) scaleY(0.2); }
+  34% { opacity: 1; clip-path: inset(30% 1% 30%); transform: translateY(24px) rotateX(-34deg) scaleY(0.48); }
+  68% { clip-path: inset(8% 0 8%); transform: translateY(0) rotateX(7deg) scaleY(0.9); }
+  100% { opacity: 1; clip-path: inset(0); transform: translateY(0) rotateX(0) scaleY(1); }
+}
+
+@keyframes love-letter-envelope-settle {
+  from { opacity: 0; transform: translate3d(0, 70px, -70px) rotate(12deg); }
+  to { opacity: 0.82; transform: translate3d(0, 0, -70px) rotate(8deg); }
+}
+
+@keyframes love-letter-ink-appear {
+  from { opacity: 0; transform: translateY(9px); filter: blur(2px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes love-letter-heart-float {
+  0%, 100% { opacity: 0.24; transform: translateY(8px) rotate(-8deg); }
+  50% { opacity: 0.74; transform: translateY(-12px) rotate(7deg); }
+}
+
+@media (max-width: 620px) {
+  .love-letter-reader {
+    padding: 14px;
+  }
+
+  .love-letter-reader__stage,
+  .love-letter-paper {
+    max-height: calc(100dvh - 28px);
+  }
+
+  .love-letter-paper {
+    padding: 38px 25px 24px;
+  }
+
+  .love-letter-paper h2 {
+    margin-bottom: 22px;
+  }
+
+  .love-letter-paper__body > p {
+    line-height: 1.82;
+  }
+
+  .love-letter-reader__close {
+    top: 20px;
+    right: 20px;
+    width: 38px;
+    height: 38px;
+    color: #75444a;
+    background: rgb(250 232 207 / 76%);
+  }
+
+  .love-letter-reader__envelope {
+    right: -12%;
+    width: 78%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .love-letter-reader,
+  .love-letter-reader__envelope,
+  .love-letter-paper,
+  .love-letter-paper header,
+  .love-letter-paper__body,
+  .love-letter-paper__keep,
+  .love-letter-reader__ambient i {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+}
+
+.cottage-love-letter-prompt {
+  display: inline-flex;
+  min-width: max-content;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 222 202 / 52%);
+  border-radius: 999px;
+  color: #fff7eb;
+  background: rgb(65 34 36 / 82%);
+  box-shadow: 0 8px 28px rgb(24 10 12 / 36%);
+  font: 650 11px/1 'PingFang SC', sans-serif;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  backdrop-filter: blur(9px);
+  animation: cottage-love-letter-prompt-in 320ms ease-out both;
+}
+
+.cottage-love-letter-prompt span {
+  color: #f4adb3;
+  font-size: 13px;
+}
+
+.cottage-love-letter-prompt[data-opening='true'] {
+  cursor: wait;
+  opacity: 0.9;
+}
+
+.cottage-love-letter-prompt:focus-visible {
+  outline: 2px solid #ffd8cb;
+  outline-offset: 3px;
+}
+
+@keyframes cottage-love-letter-prompt-in {
+  from { opacity: 0; transform: translateY(5px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cottage-love-letter-prompt {
+    animation-duration: 1ms !important;
+  }
+}

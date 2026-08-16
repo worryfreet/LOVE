@@ -1,0 +1,421 @@
+.garden-editor-panel {
+  display: grid;
+  padding: 12px 14px 28px;
+  gap: 12px;
+  animation: cottage-panel-fade 150ms ease-out;
+}
+
+.garden-editor-panel button,
+.garden-editor-panel input,
+.garden-editor-panel select {
+  font: inherit;
+}
+
+.garden-editor-panel__intro,
+.garden-block-editor > header,
+.garden-global-editor > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.garden-editor-panel__intro > div,
+.garden-block-editor > header > div:first-child,
+.garden-global-editor > header {
+  display: grid;
+  gap: 3px;
+}
+
+.garden-editor-panel__intro small,
+.garden-block-editor header small,
+.garden-global-editor header small {
+  color: var(--scene-accent);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.garden-editor-panel__intro strong,
+.garden-block-editor header strong,
+.garden-global-editor header strong {
+  font-size: 12px;
+}
+
+.garden-editor-panel__intro > span {
+  color: var(--control-muted);
+  font-size: 8px;
+}
+
+.garden-editor-history,
+.garden-editor-copy-row {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 5px;
+  align-items: center;
+}
+
+.garden-editor-history button,
+.garden-editor-copy-row button,
+.garden-block-editor header button,
+.garden-editor-add-companion {
+  display: inline-flex;
+  min-height: 28px;
+  padding: 0 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid var(--control-line);
+  background: var(--control-panel);
+  color: rgb(244 246 238 / 72%);
+  font-size: 8px;
+  cursor: pointer;
+}
+
+.garden-editor-history button:disabled,
+.garden-block-editor button:disabled,
+.garden-plan button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.garden-editor-history > span {
+  justify-self: end;
+  color: var(--control-muted);
+  font-size: 7px;
+}
+
+.garden-plan {
+  position: relative;
+  display: grid;
+  padding: 8px;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  border: 1px solid var(--control-line);
+  background:
+    linear-gradient(90deg, rgb(44 77 46 / 28%), transparent 46% 54%, rgb(44 77 46 / 28%)),
+    rgb(0 0 0 / 15%);
+}
+
+.garden-plan__side {
+  min-width: 0;
+}
+
+.garden-plan__side > header {
+  display: grid;
+  min-height: 28px;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 5px;
+}
+
+.garden-plan__side > header strong {
+  font-size: 8px;
+}
+
+.garden-plan__side > header span {
+  color: var(--control-muted);
+  font-size: 7px;
+}
+
+.garden-plan__side > header button {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--control-line);
+  background: var(--control-panel);
+  color: var(--control-ink);
+  cursor: pointer;
+}
+
+.garden-plan__blocks {
+  display: flex;
+  min-height: 210px;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.garden-plan__blocks > button {
+  position: relative;
+  display: grid;
+  min-height: 34px;
+  padding: 5px 6px 5px 11px;
+  flex: var(--block-weight) 1 0;
+  grid-template-columns: auto 1fr;
+  align-content: center;
+  gap: 1px 5px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--block-color) 34%, transparent);
+  background: color-mix(in srgb, var(--block-color) 9%, rgb(0 0 0 / 18%));
+  color: var(--control-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.garden-plan__blocks > button::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--block-color);
+  content: '';
+}
+
+.garden-plan__blocks > button[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--block-color) 78%, white 20%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--block-color) 30%, transparent);
+}
+
+.garden-plan__blocks button > span {
+  grid-row: span 2;
+  align-self: center;
+  color: var(--block-color);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 8px;
+}
+
+.garden-plan__blocks button strong,
+.garden-plan__blocks button small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.garden-plan__blocks button strong {
+  font-size: 8px;
+}
+
+.garden-plan__blocks button small {
+  color: var(--control-muted);
+  font-size: 7px;
+}
+
+.garden-plan__path {
+  position: absolute;
+  top: 36px;
+  bottom: 8px;
+  left: 50%;
+  display: grid;
+  width: 24px;
+  place-items: center;
+  transform: translateX(-50%);
+  background:
+    repeating-linear-gradient(180deg, #ddd0b5 0 13px, #799563 13px 16px);
+  color: rgb(12 25 24 / 64%);
+  font-size: 6px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-orientation: upright;
+  writing-mode: vertical-rl;
+}
+
+.garden-editor-copy-row {
+  grid-template-columns: 1fr 1fr;
+}
+
+.garden-block-editor,
+.garden-global-editor {
+  display: grid;
+  padding: 12px;
+  gap: 9px;
+  border: 1px solid var(--control-line);
+  background: rgb(255 255 255 / 2.5%);
+}
+
+.garden-block-editor > header > div:last-child {
+  display: flex;
+  gap: 4px;
+}
+
+.garden-block-editor > header button {
+  width: 28px;
+  padding: 0;
+}
+
+.garden-editor-range {
+  display: grid;
+  min-height: 30px;
+  grid-template-columns: 82px minmax(50px, 1fr) 68px;
+  align-items: center;
+  gap: 7px;
+  color: var(--control-muted);
+  font-size: 8px;
+}
+
+.garden-editor-range > input[type='range'] {
+  min-width: 0;
+  width: 100%;
+  accent-color: var(--scene-accent);
+}
+
+.garden-editor-range__value {
+  display: grid;
+  height: 25px;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  border: 1px solid var(--control-line);
+  background: rgb(0 0 0 / 15%);
+}
+
+.garden-editor-range__value input,
+.garden-editor-seed input,
+.garden-editor-select select {
+  min-width: 0;
+  width: 100%;
+  height: 23px;
+  padding: 0 5px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--control-ink);
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 8px;
+}
+
+.garden-editor-range__value small {
+  padding-right: 5px;
+  font-size: 7px;
+}
+
+.garden-editor-select,
+.garden-editor-seed,
+.garden-editor-color {
+  display: grid;
+  min-height: 29px;
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  color: var(--control-muted);
+  font-size: 8px;
+}
+
+.garden-editor-select select,
+.garden-editor-seed input {
+  height: 26px;
+  border: 1px solid var(--control-line);
+  background: rgb(0 0 0 / 15%);
+}
+
+.garden-editor-select select option {
+  color: #101b1a;
+}
+
+.garden-slot-editor {
+  display: grid;
+  padding-top: 10px;
+  gap: 7px;
+  border-top: 1px solid rgb(255 255 255 / 7%);
+}
+
+.garden-slot-editor > header {
+  display: flex;
+  min-height: 26px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.garden-slot-editor > header strong {
+  font-size: 9px;
+}
+
+.garden-slot-editor > header button {
+  border: 0;
+  background: transparent;
+  color: #e9a3a3;
+  font-size: 7px;
+  cursor: pointer;
+}
+
+.garden-slot-editor__colors {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.garden-editor-rose-preset {
+  display: grid;
+  min-height: 30px;
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  color: var(--control-muted);
+  font-size: 8px;
+}
+
+.garden-editor-rose-preset > div {
+  display: grid;
+  height: 24px;
+  grid-template-columns: repeat(5, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--control-line);
+}
+
+.garden-editor-rose-preset i {
+  display: block;
+}
+
+.garden-editor-color {
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.garden-editor-color > span:last-child {
+  display: flex;
+  height: 26px;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid var(--control-line);
+  background: rgb(0 0 0 / 15%);
+}
+
+.garden-editor-color input {
+  width: 29px;
+  height: 24px;
+  padding: 3px;
+  border: 0;
+  background: transparent;
+}
+
+.garden-editor-color code {
+  font-size: 6px;
+}
+
+.garden-editor-add-companion {
+  width: 100%;
+  border-style: dashed;
+}
+
+.garden-global-editor > header {
+  grid-template-columns: 1fr auto;
+}
+
+.garden-global-editor > header small,
+.garden-global-editor > header strong {
+  grid-column: 1;
+}
+
+.garden-editor-switch {
+  display: flex;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-items: center;
+  gap: 5px;
+  color: var(--control-muted);
+  font-size: 8px;
+}
+
+.garden-editor-panel__legend {
+  display: flex;
+  justify-content: space-between;
+  color: var(--control-muted);
+  font-size: 7px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .garden-editor-panel {
+    animation: none;
+  }
+}

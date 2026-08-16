@@ -1,0 +1,317 @@
+{
+  "version": 2,
+  "sceneId": "cottage-flower-garden",
+  "updatedAt": "2026-08-16T09:30:34.355Z",
+  "values": {
+    "palette": {
+      "groundColor": "#527d39",
+      "grassShadowColor": "#294b24",
+      "grassColor": "#527d39",
+      "grassTipColor": "#7ba54b"
+    },
+    "structures": {
+      "cottageWoodColor": "#c28a5b",
+      "cottageWoodVariation": 0.052,
+      "pathStoneColor": "#e7d8bd",
+      "pathStoneWarmColor": "#f0dcba",
+      "pathStoneRoughness": 0.96
+    },
+    "terrain": {
+      "roughness": 0.98,
+      "bumpStrength": 0.012,
+      "farMeadowTintColor": "#50c878",
+      "farMeadowTintStrength": 0.5,
+      "farFlowerStrength": 1.5,
+      "farFlowerDensity": 1.45,
+      "farFlowerScale": 1.18
+    },
+    "grass": {
+      "near": {
+        "density": 1.5,
+        "heightMinMeters": 0.139,
+        "heightMaxMeters": 0.369,
+        "widthMultiplier": 1
+      },
+      "middle": {
+        "density": 1,
+        "heightMinMeters": 0.056,
+        "heightMaxMeters": 0.146,
+        "widthMultiplier": 1
+      },
+      "windStrength": 2.5,
+      "windSpeed": 3,
+      "gustStrength": 2.5,
+      "windDirectionDegrees": 95
+    },
+    "flowers": {
+      "wild-daisy": {
+        "density": 1.2,
+        "heightMinMeters": 0.15,
+        "heightMaxMeters": 0.36,
+        "widthMultiplier": 1.08,
+        "primaryColor": "#f5f1df",
+        "secondaryColor": "#f0c63c",
+        "accentColor": "#f5f1df"
+      },
+      "pink-cosmos": {
+        "density": 1.55,
+        "heightMinMeters": 0.2,
+        "heightMaxMeters": 0.46,
+        "widthMultiplier": 1.18,
+        "primaryColor": "#ef6fa4",
+        "secondaryColor": "#bc7fd0",
+        "accentColor": "#ee786e"
+      },
+      "blue-cornflower": {
+        "density": 1.4,
+        "heightMinMeters": 0.17,
+        "heightMaxMeters": 0.4,
+        "widthMultiplier": 1.12,
+        "primaryColor": "#65a1e2",
+        "secondaryColor": "#8f85d0",
+        "accentColor": "#65a1e2"
+      }
+    },
+    "garden": {
+      "pathClearanceMeters": 0.12,
+      "pathSurfaceBlendFeatherMeters": 0.38,
+      "pathSurfaceEdgeWarpMeters": 0.14,
+      "bedEdgeFeatherMeters": 0.42,
+      "bedGrassDensity": 0.18,
+      "left": {
+        "blocks": [
+          {
+            "id": "left-01",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 11903,
+            "primary": {
+              "speciesId": "classic-rose",
+              "roseColorSelectionId": "scarlet-red",
+              "count": 200,
+              "heightMinMeters": 0.52,
+              "heightMaxMeters": 0.86,
+              "scale": 1.02,
+              "primaryColor": "#d71532",
+              "secondaryColor": "#711128",
+              "accentColor": "#f5a8bc"
+            },
+            "companion": null
+          },
+          {
+            "id": "left-02",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 17117,
+            "primary": {
+              "speciesId": "classic-rose",
+              "roseColorSelectionId": "light-pink",
+              "count": 200,
+              "heightMinMeters": 0.52,
+              "heightMaxMeters": 0.86,
+              "scale": 1.02,
+              "primaryColor": "#f5c932",
+              "secondaryColor": "#f47a1f",
+              "accentColor": "#ef3f25"
+            },
+            "companion": null
+          },
+          {
+            "id": "left-03",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 23903,
+            "primary": {
+              "speciesId": "classic-rose",
+              "roseColorSelectionId": "deep-pink",
+              "count": 200,
+              "heightMinMeters": 0.52,
+              "heightMaxMeters": 0.86,
+              "scale": 1.02,
+              "primaryColor": "#f5a8bc",
+              "secondaryColor": "#d72e72",
+              "accentColor": "#743f9d"
+            },
+            "companion": null
+          },
+          {
+            "id": "left-04",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 31129,
+            "primary": {
+              "speciesId": "classic-rose",
+              "roseColorSelectionId": "peach-pink",
+              "count": 200,
+              "heightMinMeters": 0.52,
+              "heightMaxMeters": 0.86,
+              "scale": 1.02,
+              "primaryColor": "#ef3f25",
+              "secondaryColor": "#f7a58f",
+              "accentColor": "#f5c932"
+            },
+            "companion": null
+          },
+          {
+            "id": "left-05",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 41033,
+            "primary": {
+              "speciesId": "sunflower",
+              "roseColorSelectionId": "mixed",
+              "count": 30,
+              "heightMinMeters": 1.18,
+              "heightMaxMeters": 1.48,
+              "scale": 0.38,
+              "primaryColor": "#f2a600",
+              "secondaryColor": "#ffc629",
+              "accentColor": "#d97900"
+            },
+            "companion": null
+          }
+        ]
+      },
+      "right": {
+        "blocks": [
+          {
+            "id": "right-01",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 53021,
+            "primary": {
+              "speciesId": "classic-rose",
+              "roseColorSelectionId": "snow-white",
+              "count": 200,
+              "heightMinMeters": 0.52,
+              "heightMaxMeters": 0.86,
+              "scale": 1.02,
+              "primaryColor": "#f5c932",
+              "secondaryColor": "#f7a58f",
+              "accentColor": "#ecebe4"
+            },
+            "companion": null
+          },
+          {
+            "id": "right-02",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 61039,
+            "primary": {
+              "speciesId": "classic-rose",
+              "roseColorSelectionId": "friendship-yellow",
+              "count": 200,
+              "heightMinMeters": 0.52,
+              "heightMaxMeters": 0.86,
+              "scale": 1.02,
+              "primaryColor": "#d72e72",
+              "secondaryColor": "#f5a8bc",
+              "accentColor": "#f8c2c7"
+            },
+            "companion": null
+          },
+          {
+            "id": "right-03",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 71029,
+            "primary": {
+              "speciesId": "classic-rose",
+              "roseColorSelectionId": "royal-purple",
+              "count": 200,
+              "heightMinMeters": 0.52,
+              "heightMaxMeters": 0.86,
+              "scale": 1.02,
+              "primaryColor": "#743f9d",
+              "secondaryColor": "#f5a8bc",
+              "accentColor": "#ecebe4"
+            },
+            "companion": null
+          },
+          {
+            "id": "right-04",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 83039,
+            "primary": {
+              "speciesId": "classic-rose",
+              "roseColorSelectionId": "cream-pink-gradient",
+              "count": 200,
+              "heightMinMeters": 0.52,
+              "heightMaxMeters": 0.86,
+              "scale": 1.02,
+              "primaryColor": "#f7a58f",
+              "secondaryColor": "#f47a1f",
+              "accentColor": "#f5c932"
+            },
+            "companion": null
+          },
+          {
+            "id": "right-05",
+            "lengthWeight": 1,
+            "clusterStrength": 0,
+            "seed": 97031,
+            "primary": {
+              "speciesId": "sunflower",
+              "roseColorSelectionId": "mixed",
+              "count": 30,
+              "heightMinMeters": 1.18,
+              "heightMaxMeters": 1.48,
+              "scale": 0.38,
+              "primaryColor": "#f2a600",
+              "secondaryColor": "#ffc629",
+              "accentColor": "#d97900"
+            },
+            "companion": null
+          }
+        ]
+      },
+      "trellis": {
+        "enabled": true,
+        "count": 10,
+        "heightMinMeters": 1.2,
+        "heightMaxMeters": 1.9,
+        "scale": 1,
+        "primaryColor": "#6675d7",
+        "secondaryColor": "#9d78cf",
+        "accentColor": "#f3e7ee",
+        "seed": 109037
+      }
+    },
+    "lighting": {
+      "sunIntensity": 1,
+      "sunTint": "#ffffff",
+      "sunSize": 1,
+      "ambientIntensity": 1,
+      "exposure": 1
+    },
+    "weather": {
+      "preset": "soft-clouds",
+      "cloudCoverage": 0.55,
+      "cloudOpacity": 0.68,
+      "skySaturation": 1,
+      "fogNearScale": 1,
+      "fogFarScale": 1,
+      "fogTint": "#ffffff",
+      "fogTintStrength": 0
+    },
+    "distance": {
+      "nearGrassFadeStartMeters": 18,
+      "nearGrassFadeEndMeters": 32,
+      "middleGrassFadeStartMeters": 48,
+      "middleGrassFadeEndMeters": 76,
+      "flowerActiveRadiusMeters": 32,
+      "farFlowerBlendStartMeters": 42,
+      "farFlowerBlendEndMeters": 72,
+      "aggregateFlowerStartMeters": 54,
+      "aggregateFlowerEndMeters": 96,
+      "lodNearToMiddleMeters": 34,
+      "lodMiddleToFarMeters": 82,
+      "lodHysteresisMeters": 4
+    },
+    "time": {
+      "target": "evening",
+      "transitionDurationSeconds": 10
+    }
+  }
+}
