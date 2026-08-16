@@ -46,5 +46,5 @@ Internet -> love.atimefriend.cn:443 -> Nginx -> 127.0.0.1:3100
 
 - `docker compose -f docker-compose.production.yml ps` 中数据库、对象存储和应用均应健康，迁移与 bucket 初始化应成功退出。
 - `/api/health` 返回 200；应用、数据库、对象存储和 Nginx 日志无持续 4xx/5xx 或凭证泄漏。
-- 证书续期沿用服务器既有 ACME 体系；不并行安装第二套证书管理器。
+- 证书续期沿用服务器既有证书体系；目标 ECS 当前证书位于 `/etc/pki/nginx`，不并行安装第二套证书管理器。
 - 定期验证数据库备份可恢复、对象存储持久卷、日志轮转、磁盘余量与证书到期时间。

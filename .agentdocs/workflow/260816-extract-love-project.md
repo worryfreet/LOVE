@@ -203,15 +203,15 @@ interface LoveProjectConfig {
 #### 6.1 本地工具与实例确认
 
 - [x] 先执行 `workbench version` 和 `workbench config list`，只确认 CLI、守护进程和活动 profile 可用；禁止把 AccessKey、STS Token、SSH 私钥或完整配置输出写入项目日志。
-- [ ] 从现有基础设施文档或用户提供信息确认 ECS `instance-id` 与 region；若只有 region，则使用 `workbench list ecs --region <region> --status Running --output json` 定位候选实例，再按名称、私网 IP 和标签缩小到唯一目标。
-- [ ] 记录最终目标实例 ID、region、实例名称和发布窗口；所有后续 `exec` 必须显式指定该实例，禁止对模糊列表批量执行。
+- [x] 从 DNS 与 Workbench 实例列表确认唯一 ECS：`cn-beijing / i-2ze68pw7irayg74flgod / ashi-deploy`，公网 IP 为 `39.105.134.119`。
+- [x] 记录最终目标实例 ID、region、实例名称和发布窗口；所有后续 `exec` 必须显式指定该实例，禁止对模糊列表批量执行。
 
 #### 6.2 只读服务器审计
 
-- [ ] 使用独立的 `workbench exec` 读取操作系统、CPU、内存、磁盘、时区、开放端口、现有进程、Docker/Compose、Node.js、Git、Nginx/Caddy、证书工具和防火墙状态。
-- [ ] 检查 `/srv/love` 候选目录、现有容器、反向代理站点和 `3000/80/443` 端口是否冲突；在任何上传或覆盖前先读取目标文件是否存在。
-- [ ] 只检查服务器 SSH Key 的存在、权限和 GitHub 握手结果，不读取、不打印私钥正文；使用批处理模式验证其可只读访问 `git@github.com:worryfreet/LOVE.git`。
-- [ ] 核对 `love.atimefriend.cn` 的 DNS 解析、现有证书、80/443 公网入口和安全组。如果 ECS 没有公网入口，仅有 Workbench 管理通道，则必须先接入 EIP、SLB、反向代理或其他公开入口，不能把 Workbench 会话当成网站访问链路。
+- [x] 完成只读系统审计：Alibaba Cloud Linux 4、2 vCPU、7.3 GiB 内存、70 GiB 可用磁盘、Asia/Shanghai；Docker 24.0.9、独立 `docker-compose` v5.3.1、Git 2.47.3、Nginx 1.30.4 均可用。
+- [x] `/srv/love` 尚不存在、当前无容器，3100 未占用；80/443 由现有 Nginx 使用，现有 `love.atimefriend.cn` 站点为静态占位页。
+- [x] 服务器 SSH Key 存在且私钥权限 600，GitHub 批处理握手成功，`git ls-remote` 读取到批准提交 `84a73fb`；未读取或输出私钥正文。
+- [x] DNS 指向实例公网 IP；80/443 均公开可达。现有 DigiCert 证书覆盖 `love.atimefriend.cn` 与 `www.love.atimefriend.cn`，有效期至 2026-11-11。
 - [ ] 若服务器位于中国内地，部署前核对域名备案、接入备案和 HTTPS 证书状态；未满足公网发布条件时停止在审计阶段，不修改线上服务。
 
 #### 6.3 生产目录与秘密管理

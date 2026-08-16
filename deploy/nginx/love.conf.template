@@ -1,17 +1,19 @@
 server {
     listen 80;
     listen [::]:80;
-    server_name love.atimefriend.cn;
+    server_name love.atimefriend.cn www.love.atimefriend.cn;
     return 301 https://$host$request_uri;
 }
 
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name love.atimefriend.cn;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name love.atimefriend.cn www.love.atimefriend.cn;
 
-    ssl_certificate /etc/letsencrypt/live/love.atimefriend.cn/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/love.atimefriend.cn/privkey.pem;
+    ssl_certificate /etc/pki/nginx/love.atimefriend.cn.pem;
+    ssl_certificate_key /etc/pki/nginx/private/love.atimefriend.cn.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
 
     client_max_body_size 12m;
 
