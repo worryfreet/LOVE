@@ -15,6 +15,7 @@ import {
   sampleCottageGardenSkyAnimation,
 } from "../src/entities/scene/items/cottage-flower-garden/model/gardenSkyAnimation";
 import {
+  COTTAGE_GARDEN_METEOR_TRAIL_RENDER_OFFSETS,
   createCottageGardenMeteorRenderBundle,
   disposeCottageGardenMeteorRender,
   updateCottageGardenMeteorRender,
@@ -208,6 +209,13 @@ describe("花海小院十秒告白天空", () => {
     assert.equal(opacities.getX(63), 0);
     assert.equal(bundle.trailMaterial.depthTest, true);
     assert.equal(bundle.trailMaterial.depthWrite, false);
+    assert.equal(COTTAGE_GARDEN_METEOR_TRAIL_RENDER_OFFSETS.length, 3);
+    assert.deepEqual(COTTAGE_GARDEN_METEOR_TRAIL_RENDER_OFFSETS[0], [0, 0, 0]);
+    assert.ok(
+      COTTAGE_GARDEN_METEOR_TRAIL_RENDER_OFFSETS.slice(1).every(
+        ([x, y]) => Math.hypot(x, y) > 0.5,
+      ),
+    );
 
     disposeCottageGardenMeteorRender(bundle);
   });

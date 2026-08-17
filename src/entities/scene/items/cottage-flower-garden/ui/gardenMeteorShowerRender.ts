@@ -14,6 +14,12 @@ import {
 const METEOR_TRAIL_SEGMENTS = 32;
 const METEOR_FRAGMENT_SLOTS = 4;
 
+export const COTTAGE_GARDEN_METEOR_TRAIL_RENDER_OFFSETS = [
+  [0, 0, 0],
+  [-0.55, 0.38, 0],
+  [0.55, -0.38, 0],
+] as const;
+
 const meteorTrailVertexShader = /* glsl */ `
   attribute vec3 color;
   attribute float aOpacity;
@@ -34,8 +40,8 @@ const meteorTrailFragmentShader = /* glsl */ `
   void main() {
     float opacity = clamp(vOpacity, 0.0, 1.0);
     if (opacity < 0.008) discard;
-    vec3 radiance = vColor * (0.32 + opacity * 2.35);
-    gl_FragColor = vec4(radiance, opacity * 0.68);
+    vec3 radiance = vColor * (0.72 + opacity * 3.2);
+    gl_FragColor = vec4(radiance, opacity * 0.96);
   }
 `;
 
@@ -49,8 +55,8 @@ const meteorPointVertexShader = /* glsl */ `
 
   void main() {
     vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
-    float perspectiveSize = 310.0 / max(1.0, -viewPosition.z);
-    gl_PointSize = max(1.0, aSize * uPixelRatio * perspectiveSize);
+    float perspectiveSize = 440.0 / max(1.0, -viewPosition.z);
+    gl_PointSize = max(2.0, aSize * uPixelRatio * perspectiveSize);
     gl_Position = projectionMatrix * viewPosition;
     vColor = color;
     vOpacity = aOpacity;
@@ -65,9 +71,9 @@ const meteorPointFragmentShader = /* glsl */ `
     float radius = length(gl_PointCoord - vec2(0.5));
     float core = 1.0 - smoothstep(0.035, 0.2, radius);
     float halo = 1.0 - smoothstep(0.16, 0.5, radius);
-    float opacity = (core * 0.9 + halo * 0.2) * clamp(vOpacity, 0.0, 1.0);
+    float opacity = (core * 0.96 + halo * 0.34) * clamp(vOpacity, 0.0, 1.0);
     if (opacity < 0.008) discard;
-    gl_FragColor = vec4(vColor * (0.72 + core * 3.4), opacity);
+    gl_FragColor = vec4(vColor * (0.9 + core * 4.2), opacity);
   }
 `;
 

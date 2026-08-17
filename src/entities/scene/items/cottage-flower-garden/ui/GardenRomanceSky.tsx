@@ -27,6 +27,7 @@ import {
   type CottageGardenSkyAnimationCommand,
 } from "../model/gardenSkyAnimation";
 import {
+  COTTAGE_GARDEN_METEOR_TRAIL_RENDER_OFFSETS,
   COTTAGE_GARDEN_METEOR_RENDER_DIAGNOSTICS,
   createCottageGardenMeteorRenderBundle,
   disposeCottageGardenMeteorRender,
@@ -386,13 +387,17 @@ export function CottageGardenRomanceSky({
           frustumCulled={false}
           renderOrder={-3}
         />
-        <lineSegments
-          name="atmosphere.romance-sky.meteor-ablation-trails"
-          geometry={meteorRender.trailGeometry}
-          material={meteorRender.trailMaterial}
-          frustumCulled={false}
-          renderOrder={-2}
-        />
+        {COTTAGE_GARDEN_METEOR_TRAIL_RENDER_OFFSETS.map((offset, index) => (
+          <lineSegments
+            key={`meteor-trail-pass-${index}`}
+            name={`atmosphere.romance-sky.meteor-ablation-trails.${index + 1}`}
+            geometry={meteorRender.trailGeometry}
+            material={meteorRender.trailMaterial}
+            position={offset}
+            frustumCulled={false}
+            renderOrder={-2}
+          />
+        ))}
         <points
           name="atmosphere.romance-sky.meteor-heads"
           geometry={meteorRender.headGeometry}
