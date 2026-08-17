@@ -39,7 +39,7 @@ describe("花海小院十秒告白天空", () => {
     assert.equal(heldFinale.assemblyProgress, 1);
     assert.equal(heldFinale.messageOpacity, 1);
     assert.equal(heldFinale.complete, true);
-    assert.ok(COTTAGE_GARDEN_SKY_ANIMATION.messageBaseHeightMeters >= 150);
+    assert.ok(COTTAGE_GARDEN_SKY_ANIMATION.messageBaseHeightMeters >= 240);
     assert.ok(
       COTTAGE_GARDEN_SKY_RENDER_FAR_METERS >
         COTTAGE_GARDEN_SKY_DOME_RADIUS_METERS,

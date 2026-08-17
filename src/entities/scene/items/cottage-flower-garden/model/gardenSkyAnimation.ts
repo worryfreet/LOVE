@@ -67,7 +67,7 @@ export const COTTAGE_GARDEN_SKY_ANIMATION = {
   messageAssemblyStartSeconds: 3.1,
   messageAssemblyEndSeconds: 7.4,
   messageDepthMeters: -420,
-  messageBaseHeightMeters: 160,
+  messageBaseHeightMeters: 260,
   backgroundStarCount: 4_200,
   messageStarsPerCell: 5,
   seed: 0x1a0e_2026,
