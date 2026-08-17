@@ -46,9 +46,10 @@ export function CottageExperienceCoordinator({
     }
     scene.userData.cottageExperience = {
       ...snapshot,
-      exteriorHighDensityVisible: snapshot.zone !== 'interior',
+      exteriorHighDensityVisible:
+        snapshot.zone !== 'interior' || snapshot.visualOpen,
       layers: {
-        exterior: snapshot.zone !== 'interior',
+        exterior: snapshot.zone !== 'interior' || snapshot.visualOpen,
         threshold: true,
         interior: snapshot.visualOpen || snapshot.zone !== 'exterior',
       },

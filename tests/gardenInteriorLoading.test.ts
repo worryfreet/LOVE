@@ -68,6 +68,8 @@ describe('小屋首次进入加载过渡', () => {
     assert.match(loadingSource, /data-testid="garden-scene-loading"/u)
     assert.match(loadingSource, /正在点亮小屋/u)
     assert.match(loadingSource, /照片、书信与灯火正在就位/u)
+    assert.match(loadingSource, /正在打开花园/u)
+    assert.match(loadingSource, /花海与晚风正在回到门外/u)
     assert.match(loadingStyles, /\.sceneLoadingVeil\[data-visible='true'\]/u)
     assert.match(loadingStyles, /threshold-breathe/u)
     assert.match(loadingStyles, /prefers-reduced-motion: reduce/u)

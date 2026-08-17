@@ -8,7 +8,10 @@ export type {
 } from './model/partTypes'
 export { CottageSingleBed } from './items/cottage-single-bed'
 export { CottageLoveseatSofa } from './items/cottage-loveseat-sofa'
-export { CottagePhotoFrame } from './items/cottage-photo-frame'
+export {
+  cottageDefaultMemoryPhotoUrl,
+  CottagePhotoFrame,
+} from './items/cottage-photo-frame'
 export { CottageCastIronStove } from './items/cottage-cast-iron-stove'
 export { CottageRoundTable } from './items/cottage-round-table'
 export { CottageWoodChair } from './items/cottage-wood-chair'

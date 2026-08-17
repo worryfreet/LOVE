@@ -141,6 +141,9 @@ export function isCottageDoorSweepBlocked(
 class CottagePortalRuntime {
   private snapshot = createSnapshot()
   private readonly subscribers = new Set<() => void>()
+  private traversalOrigin: 'exterior' | 'interior' | null = null
+  private traversalEnteredThreshold = false
+  private traversalReachedOppositeSide = false
 
   getSnapshot = () => this.snapshot
 
@@ -156,17 +159,36 @@ class CottagePortalRuntime {
     if (notify) this.subscribers.forEach((subscriber) => subscriber())
   }
 
+  private clearTraversal() {
+    this.traversalOrigin = null
+    this.traversalEnteredThreshold = false
+    this.traversalReachedOppositeSide = false
+  }
+
   reset() {
+    this.clearTraversal()
     this.publish(createSnapshot(this.snapshot.epoch + 1))
   }
 
-  requestOpen() {
+  requestOpen(observerPosition?: readonly [number, number, number]) {
     if (
       this.snapshot.motion !== 'closed' &&
       this.snapshot.motion !== 'closing'
     ) {
       return false
     }
+    const frontZ =
+      COTTAGE_ARCHITECTURE.envelope.centerZ +
+      COTTAGE_ARCHITECTURE.envelope.depth / 2
+    this.traversalOrigin = observerPosition
+      ? observerPosition[2] <= frontZ
+        ? 'interior'
+        : 'exterior'
+      : this.snapshot.zone === 'interior'
+        ? 'interior'
+        : 'exterior'
+    this.traversalEnteredThreshold = false
+    this.traversalReachedOppositeSide = false
     this.publish({
       ...this.snapshot,
       epoch: this.snapshot.epoch + 1,
@@ -186,6 +208,7 @@ class CottagePortalRuntime {
     if (observerPosition && isCottageDoorSweepBlocked(observerPosition)) {
       return false
     }
+    this.clearTraversal()
     this.publish({
       ...this.snapshot,
       epoch: this.snapshot.epoch + 1,
@@ -204,7 +227,7 @@ class CottagePortalRuntime {
     ) {
       return this.requestClose(observer.position)
     }
-    return this.requestOpen()
+    return this.requestOpen(observer.position)
   }
 
   setZone(zone: CottageExperienceZone) {
@@ -213,7 +236,30 @@ class CottagePortalRuntime {
   }
 
   updateZoneFromPosition(position: readonly [number, number, number]) {
-    this.setZone(resolveCottageExperienceZone(position))
+    const zone = resolveCottageExperienceZone(position)
+    this.setZone(zone)
+    if (
+      !this.traversalOrigin ||
+      this.snapshot.motion === 'closed' ||
+      this.snapshot.motion === 'closing'
+    ) {
+      return
+    }
+    if (zone === 'threshold') {
+      this.traversalEnteredThreshold = true
+      return
+    }
+    if (zone === this.traversalOrigin) {
+      if (!this.traversalReachedOppositeSide) {
+        this.traversalEnteredThreshold = false
+      }
+      return
+    }
+    if (!this.traversalEnteredThreshold) return
+    this.traversalReachedOppositeSide = true
+    if (!isCottageDoorSweepBlocked(position)) {
+      this.requestClose()
+    }
   }
 
   tick(deltaSeconds: number) {

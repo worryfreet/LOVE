@@ -60,13 +60,33 @@ export const COTTAGE_INTERIOR_STORAGE_KEY =
 export const COTTAGE_INTERIOR_LEGACY_STORAGE_KEY =
   'atlas-scene:cottage-flower-garden:interior:v1'
 export const COTTAGE_INTERIOR_MAX_PHOTOS = 9
+export const COTTAGE_INTERIOR_PHOTO_SLOT_IDS = [
+  'photo-01',
+  'photo-02',
+  'photo-03',
+  'photo-04',
+  'photo-05',
+  'photo-06',
+  'photo-07',
+  'photo-08',
+  'photo-09',
+] as const
+export type CottageInteriorPhotoSlotId =
+  (typeof COTTAGE_INTERIOR_PHOTO_SLOT_IDS)[number]
 export const COTTAGE_INTERIOR_MAX_PATH_POINTS = 32
 export const COTTAGE_INTERIOR_MAX_INSTANCES = 96
 export const COTTAGE_INTERIOR_MAX_EMBEDDED_PHOTO_CHARACTERS = 180_000
 
 const INSTANCE_ID_PATTERN = /^interior-instance-(\d{3,})$/u
 const PART_ID_SET = new Set<string>(COTTAGE_INTERIOR_PART_IDS)
+const PHOTO_SLOT_ID_SET = new Set<string>(COTTAGE_INTERIOR_PHOTO_SLOT_IDS)
 const floorY = COTTAGE_INTERIOR_NAVIGATION.floorTop
+
+export function isCottageInteriorPhotoSlotId(
+  value: unknown,
+): value is CottageInteriorPhotoSlotId {
+  return typeof value === 'string' && PHOTO_SLOT_ID_SET.has(value)
+}
 
 function transform(
   position: readonly [number, number, number],
@@ -121,10 +141,6 @@ export function createDefaultCottageInteriorInstances() {
     COTTAGE_INTERIOR_NAVIGATION.minZ -
     COTTAGE_FLOWER_GARDEN_LAYOUT.cottage.centerZ +
     0.027
-  const eastPhotoX =
-    COTTAGE_INTERIOR_NAVIGATION.maxX -
-    COTTAGE_FLOWER_GARDEN_LAYOUT.cottage.centerX -
-    0.027
   const defaults: CottageInteriorInstance[] = [
     createDefaultBookcaseInstance(),
     instance(2, 'cottage-loveseat-sofa', [-2.25, floorY, 0.42], Math.PI / 2, {
@@ -166,25 +182,9 @@ export function createDefaultCottageInteriorInstances() {
     instance(
       8,
       'cottage-candle',
-      [-0.1, tableTop, -0.17],
+      [-0.04, tableTop, -0.18],
       0,
-      { diameter: 0.065, height: 0.19, color: '#FFF1D2', lit: true },
-      { supportId: 'interior-instance-004' },
-    ),
-    instance(
-      9,
-      'cottage-candle',
-      [0.02, tableTop, -0.24],
-      0,
-      { diameter: 0.055, height: 0.14, color: '#F7D8C5', lit: true },
-      { supportId: 'interior-instance-004' },
-    ),
-    instance(
-      10,
-      'cottage-candle',
-      [0.15, tableTop, -0.16],
-      0,
-      { diameter: 0.05, height: 0.11, color: '#FFF1D2', lit: true },
+      { diameter: 0.09, height: 0.26, color: '#FFF1D2', lit: true },
       { supportId: 'interior-instance-004' },
     ),
     instance(
@@ -200,77 +200,84 @@ export function createDefaultCottageInteriorInstances() {
       },
       { supportId: 'interior-instance-004' },
     ),
-    // 北墙：同一中心线上的五联照片墙，以中央主照片和两侧对称节奏建立秩序。
-    instance(12, 'cottage-photo-frame', [0, 1.74, photoZ], 0, {
+    // 北墙：八张常规比例照片沿同一抬高中心线形成完整画廊。
+    instance(12, 'cottage-photo-frame', [-0.425, 1.89, photoZ], 0, {
       mount: 'wall',
-      width: 1180,
-      height: 740,
-      frameRailWidth: 18,
-      matWidth: 4,
+      photoSlotId: 'photo-01',
+      width: 1500,
+      height: 1000,
+      frameRailWidth: 16,
+      matWidth: 3,
       frameColor: '#74462B',
       imageUrl: '',
     }),
-    instance(13, 'cottage-photo-frame', [-1.55, 1.74, photoZ], 0, {
+    instance(13, 'cottage-photo-frame', [-2.955, 1.89, photoZ], 0, {
       mount: 'wall',
-      width: 430,
-      height: 300,
-      frameRailWidth: 18,
-      matWidth: 8,
+      photoSlotId: 'photo-02',
+      width: 720,
+      height: 480,
+      frameRailWidth: 16,
+      matWidth: 5,
       frameColor: '#956640',
       imageUrl: '',
     }),
-    instance(14, 'cottage-photo-frame', [-0.92, 1.74, photoZ], 0, {
+    instance(14, 'cottage-photo-frame', [-2.225, 1.89, photoZ], 0, {
       mount: 'wall',
-      width: 340,
-      height: 480,
-      frameRailWidth: 18,
-      matWidth: 8,
+      photoSlotId: 'photo-03',
+      width: 480,
+      height: 720,
+      frameRailWidth: 16,
+      matWidth: 5,
       frameColor: '#6E4328',
       imageUrl: '',
     }),
-    instance(15, 'cottage-photo-frame', [0.92, 1.74, photoZ], 0, {
+    instance(15, 'cottage-photo-frame', [0.735, 1.89, photoZ], 0, {
       mount: 'wall',
-      width: 340,
-      height: 480,
-      frameRailWidth: 18,
-      matWidth: 8,
+      photoSlotId: 'photo-04',
+      width: 480,
+      height: 720,
+      frameRailWidth: 16,
+      matWidth: 5,
       frameColor: '#8A5835',
       imageUrl: '',
     }),
-    instance(16, 'cottage-photo-frame', [1.55, 1.74, photoZ], 0, {
+    instance(16, 'cottage-photo-frame', [2.955, 1.89, photoZ], 0, {
       mount: 'wall',
-      width: 430,
-      height: 300,
-      frameRailWidth: 18,
-      matWidth: 8,
+      photoSlotId: 'photo-05',
+      width: 720,
+      height: 480,
+      frameRailWidth: 16,
+      matWidth: 5,
       frameColor: '#A06B43',
       imageUrl: '',
     }),
-    // 东墙：三张相框整体前移，避开后侧书柜并保持等距节奏。
-    instance(17, 'cottage-photo-frame', [eastPhotoX, 1.84, -0.72], -Math.PI / 2, {
+    instance(17, 'cottage-photo-frame', [-1.575, 1.89, photoZ], 0, {
       mount: 'wall',
-      width: 380,
-      height: 520,
-      frameRailWidth: 18,
-      matWidth: 8,
+      photoSlotId: 'photo-06',
+      width: 480,
+      height: 720,
+      frameRailWidth: 16,
+      matWidth: 5,
       frameColor: '#74462B',
       imageUrl: '',
     }),
-    instance(18, 'cottage-photo-frame', [eastPhotoX, 1.84, 0.12], -Math.PI / 2, {
+    instance(18, 'cottage-photo-frame', [1.485, 1.89, photoZ], 0, {
       mount: 'wall',
-      width: 500,
-      height: 340,
-      frameRailWidth: 18,
-      matWidth: 8,
+      photoSlotId: 'photo-07',
+      width: 720,
+      height: 480,
+      frameRailWidth: 16,
+      matWidth: 5,
       frameColor: '#9A6A45',
       imageUrl: '',
     }),
-    instance(19, 'cottage-photo-frame', [eastPhotoX, 1.84, 0.96], -Math.PI / 2, {
+    instance(19, 'cottage-photo-frame', [2.235, 1.89, photoZ], 0, {
       mount: 'wall',
-      width: 380,
-      height: 520,
-      frameRailWidth: 18,
-      matWidth: 8,
+      photoSlotId: 'photo-08',
+      width: 480,
+      height: 720,
+      frameRailWidth: 16,
+      matWidth: 5,
       frameColor: '#805033',
       imageUrl: '',
     }),
@@ -282,8 +289,9 @@ export function createDefaultCottageInteriorInstances() {
       0.12,
       {
         mount: 'table',
-        width: 210,
-        height: 270,
+        photoSlotId: 'photo-09',
+        width: 240,
+        height: 360,
         frameRailWidth: 16,
         matWidth: 6,
         frameColor: '#8A5835',
@@ -345,12 +353,118 @@ function matchesLegacyDefaultBed(candidate: unknown) {
   )
 }
 
-/** 只替换旧版原封不动的默认床，用户自行摆放或改过参数的床继续保留。 */
-function migrateLegacyDefaultFurniture(value: unknown) {
-  if (!Array.isArray(value)) return value
-  return value.map((candidate) =>
-    matchesLegacyDefaultBed(candidate) ? createDefaultBookcaseInstance() : candidate,
+const matchesLegacyDefaultPhoto = (
+  candidate: unknown,
+  id: string,
+  position: readonly [number, number, number],
+  rotationY: number,
+  size: readonly [number, number],
+) => {
+  if (!candidate || typeof candidate !== 'object') return false
+  const source = candidate as Partial<CottageInteriorInstance>
+  return (
+    source.id === id &&
+    source.partId === 'cottage-photo-frame' &&
+    source.position?.x === position[0] &&
+    source.position?.y === position[1] &&
+    source.position?.z === position[2] &&
+    source.rotation?.y === rotationY &&
+    Number(source.parameters?.width) === size[0] &&
+    Number(source.parameters?.height) === size[1] &&
+    !source.parameters?.photoSlotId
   )
+}
+
+const matchesLegacyDefaultCandle = (
+  candidate: unknown,
+  id: string,
+  position: readonly [number, number, number],
+  size: readonly [number, number],
+) => {
+  if (!candidate || typeof candidate !== 'object') return false
+  const source = candidate as Partial<CottageInteriorInstance>
+  return (
+    source.id === id &&
+    source.partId === 'cottage-candle' &&
+    source.position?.x === position[0] &&
+    source.position?.y === position[1] &&
+    source.position?.z === position[2] &&
+    Number(source.parameters?.diameter) === size[0] &&
+    Number(source.parameters?.height) === size[1]
+  )
+}
+
+/** 只迁移历版原封不动的默认陈设，用户自行改过位置或尺寸的实例继续保留。 */
+export function migrateLegacyDefaultCottageInteriorInstances(value: unknown) {
+  if (!Array.isArray(value)) return value
+  const nextDefaults = createDefaultCottageInteriorInstances()
+  const nextById = new Map(nextDefaults.map((item) => [item.id, item]))
+  const tableTop = floorY + 0.74
+  const photoZ =
+    COTTAGE_INTERIOR_NAVIGATION.minZ -
+    COTTAGE_FLOWER_GARDEN_LAYOUT.cottage.centerZ +
+    0.027
+  const eastPhotoX =
+    COTTAGE_INTERIOR_NAVIGATION.maxX -
+    COTTAGE_FLOWER_GARDEN_LAYOUT.cottage.centerX -
+    0.027
+  const legacyPhotos = new Map<string, {
+    position: readonly [number, number, number]
+    rotationY: number
+    size: readonly [number, number]
+  }>([
+    ['interior-instance-012', { position: [0, 1.74, photoZ], rotationY: 0, size: [1180, 740] }],
+    ['interior-instance-013', { position: [-1.55, 1.74, photoZ], rotationY: 0, size: [430, 300] }],
+    ['interior-instance-014', { position: [-0.92, 1.74, photoZ], rotationY: 0, size: [340, 480] }],
+    ['interior-instance-015', { position: [0.92, 1.74, photoZ], rotationY: 0, size: [340, 480] }],
+    ['interior-instance-016', { position: [1.55, 1.74, photoZ], rotationY: 0, size: [430, 300] }],
+    ['interior-instance-017', { position: [eastPhotoX, 1.84, -0.72], rotationY: -Math.PI / 2, size: [380, 520] }],
+    ['interior-instance-018', { position: [eastPhotoX, 1.84, 0.12], rotationY: -Math.PI / 2, size: [500, 340] }],
+    ['interior-instance-019', { position: [eastPhotoX, 1.84, 0.96], rotationY: -Math.PI / 2, size: [380, 520] }],
+    ['interior-instance-020', { position: [-0.31, tableTop, -0.29], rotationY: 0.12, size: [210, 270] }],
+  ])
+  const legacyCandles = new Map<string, {
+    position: readonly [number, number, number]
+    size: readonly [number, number]
+  }>([
+    ['interior-instance-008', { position: [-0.1, tableTop, -0.17], size: [0.065, 0.19] }],
+    ['interior-instance-009', { position: [0.02, tableTop, -0.24], size: [0.055, 0.14] }],
+    ['interior-instance-010', { position: [0.15, tableTop, -0.16], size: [0.05, 0.11] }],
+  ])
+
+  return value.flatMap((candidate) => {
+    if (matchesLegacyDefaultBed(candidate)) return [createDefaultBookcaseInstance()]
+    if (!candidate || typeof candidate !== 'object') return [candidate]
+    const source = candidate as Partial<CottageInteriorInstance>
+    const photo = typeof source.id === 'string' ? legacyPhotos.get(source.id) : undefined
+    if (
+      photo &&
+      matchesLegacyDefaultPhoto(
+        candidate,
+        source.id as string,
+        photo.position,
+        photo.rotationY,
+        photo.size,
+      )
+    ) {
+      return [nextById.get(source.id as string) ?? candidate]
+    }
+    const candle = typeof source.id === 'string' ? legacyCandles.get(source.id) : undefined
+    if (
+      candle &&
+      matchesLegacyDefaultCandle(
+        candidate,
+        source.id as string,
+        candle.position,
+        candle.size,
+      )
+    ) {
+      return source.id === 'interior-instance-008'
+        ? [nextById.get(source.id) ?? candidate]
+        : []
+    }
+    return [candidate]
+  })
 }
 
 function finite(value: unknown): value is number {
@@ -400,11 +514,14 @@ const PART_PARAMETER_RULES: Readonly<
   },
   'cottage-photo-frame': {
     numbers: {
-      width: [240, 1200, 520], height: [240, 900, 400],
+      width: [240, 1600, 520], height: [240, 1200, 400],
       frameRailWidth: [12, 50, 24], matWidth: [0, 40, 16],
     },
     colors: { frameColor: '#8A5835' },
-    enums: { mount: ['wall', ['wall', 'table']] },
+    enums: {
+      mount: ['wall', ['wall', 'table']],
+      photoSlotId: ['photo-01', COTTAGE_INTERIOR_PHOTO_SLOT_IDS],
+    },
   },
   'cottage-cast-iron-stove': {
     numbers: {
@@ -726,7 +843,7 @@ export function parseCottageInteriorDocument(serialized: string | null) {
     }
     const sourceInstances =
       candidate.schemaVersion === 2
-        ? migrateLegacyDefaultFurniture(candidate.instances)
+        ? migrateLegacyDefaultCottageInteriorInstances(candidate.instances)
         : candidate.schemaVersion === 1
           ? migrateLegacyCottageInteriorInstances(candidate.instances)
           : null

@@ -69,12 +69,12 @@ describe('小院纪念相框', () => {
   it('大图允许细木框与极窄卡纸，让照片开口占据主体面积', () => {
     const hero = resolveCottagePhotoFrameSpec({
       mount: 'wall',
-      width: 1.18,
-      height: 0.74,
-      frameRailWidth: 0.018,
-      matWidth: 0.004,
+      width: 1.5,
+      height: 1,
+      frameRailWidth: 0.016,
+      matWidth: 0.003,
     })
-    assert.equal(hero.frameRailWidth, 0.018)
+    assert.equal(hero.frameRailWidth, 0.016)
     assert.ok(
       (hero.photoWidth * hero.photoHeight) / (hero.width * hero.height) > 0.9,
     )

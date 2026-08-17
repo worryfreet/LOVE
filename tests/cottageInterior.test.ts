@@ -21,6 +21,7 @@ import {
   COTTAGE_INTERIOR_DEFAULT_DOCUMENT,
   COTTAGE_INTERIOR_MAX_PATH_POINTS,
   COTTAGE_INTERIOR_MAX_PHOTOS,
+  COTTAGE_INTERIOR_PHOTO_SLOT_IDS,
   COTTAGE_INTERIOR_PART_IDS,
   createCottageInteriorInstance,
   createDefaultCottageInteriorInstances,
@@ -29,6 +30,7 @@ import {
   normalizeCottageInteriorPartParameters,
   normalizeCottageInteriorInstances,
   parseCottageInteriorDocument,
+  migrateLegacyDefaultCottageInteriorInstances,
   migrateLegacyCottageInteriorInstances,
 } from '../src/entities/scene/items/cottage-flower-garden/model/cottageInteriorInstances'
 import {
@@ -74,6 +76,13 @@ const gardenExperienceSource = await readFile(
 const interiorWorldSource = await readFile(
   new URL(
     '../src/entities/scene/items/cottage-flower-garden/ui/World.tsx',
+    import.meta.url,
+  ),
+  'utf8',
+)
+const cottageInteriorSource = await readFile(
+  new URL(
+    '../src/entities/scene/items/cottage-flower-garden/ui/CottageInterior.tsx',
     import.meta.url,
   ),
   'utf8',
@@ -228,7 +237,7 @@ describe('花海小院室内建筑骨架', () => {
 })
 
 describe('花海小院室内实例文档', () => {
-  it('冻结十一类目录零件与九张照片的有序礼物叙事陈设', () => {
+  it('冻结十一类目录零件、单支大蜡烛与九个明确照片位置', () => {
     assert.equal(COTTAGE_INTERIOR_PART_IDS.length, 11)
     const defaults = createDefaultCottageInteriorInstances()
     assert.deepEqual(defaults, COTTAGE_INTERIOR_DEFAULT_DOCUMENT.instances)
@@ -239,7 +248,7 @@ describe('花海小院室内实例文档', () => {
     assert.equal(photos.length, COTTAGE_INTERIOR_MAX_PHOTOS)
     assert.equal(
       defaults.filter((instance) => instance.partId === 'cottage-candle').length,
-      3,
+      1,
     )
     assert.equal(
       defaults.filter((instance) => instance.partId === 'cottage-wood-chair')
@@ -250,7 +259,7 @@ describe('花海小院室内实例文档', () => {
       (photo) =>
         photo.parameters.mount === 'wall' && photo.rotation.y === 0,
     )
-    const eastWallPhotos = photos.filter(
+    const sideWallPhotos = photos.filter(
       (photo) =>
         photo.parameters.mount === 'wall' &&
         photo.rotation.y === -Math.PI / 2,
@@ -258,8 +267,8 @@ describe('花海小院室内实例文档', () => {
     const tablePhoto = photos.find(
       (photo) => photo.parameters.mount === 'table',
     )
-    assert.equal(northWallPhotos.length, 5)
-    assert.equal(eastWallPhotos.length, 3)
+    assert.equal(northWallPhotos.length, 8)
+    assert.equal(sideWallPhotos.length, 0)
     assert.ok(tablePhoto)
     const northHero = northWallPhotos.reduce((largest, photo) =>
       Number(photo.parameters.width) * Number(photo.parameters.height) >
@@ -267,40 +276,35 @@ describe('花海小院室内实例文档', () => {
         ? photo
         : largest,
     )
-    assert.equal(northHero.position.x, 0)
-    assert.equal(northHero.parameters.width, 1180)
-    assert.equal(northHero.parameters.height, 740)
-    assert.equal(northHero.parameters.frameRailWidth, 18)
-    assert.equal(northHero.parameters.matWidth, 4)
-    assert.ok(northWallPhotos.every((photo) => photo.position.y === 1.74))
+    assert.equal(northHero.position.x, -0.425)
+    assert.equal(northHero.parameters.width, 1500)
+    assert.equal(northHero.parameters.height, 1000)
+    assert.equal(northHero.parameters.frameRailWidth, 16)
+    assert.equal(northHero.parameters.matWidth, 3)
+    assert.ok(northWallPhotos.every((photo) => photo.position.y === 1.89))
     assert.deepEqual(
       northWallPhotos.map((photo) => photo.position.x).sort((a, b) => a - b),
-      [-1.55, -0.92, 0, 0.92, 1.55],
+      [-2.955, -2.225, -1.575, -0.425, 0.735, 1.485, 2.235, 2.955],
     )
+    const sortedNorthPhotos = [...northWallPhotos].sort(
+      (left, right) => left.position.x - right.position.x,
+    )
+    sortedNorthPhotos.forEach((photo, index) => {
+      const ratio = Number(photo.parameters.width) / Number(photo.parameters.height)
+      assert.ok(
+        Math.abs(ratio - 1.5) < 0.000_001 ||
+          Math.abs(ratio - 2 / 3) < 0.000_001,
+        `${photo.id} 必须使用常见横竖照片比例`,
+      )
+      const next = sortedNorthPhotos[index + 1]
+      if (!next) return
+      const rightEdge = photo.position.x + Number(photo.parameters.width) / 2_000
+      const nextLeftEdge = next.position.x - Number(next.parameters.width) / 2_000
+      assert.ok(nextLeftEdge - rightEdge >= 0.1)
+    })
     assert.deepEqual(
-      northWallPhotos
-        .filter((photo) => photo.id !== northHero.id)
-        .map((photo) =>
-          `${String(photo.parameters.width)}×${String(photo.parameters.height)}`,
-        )
-        .sort(),
-      ['340×480', '340×480', '430×300', '430×300'],
-    )
-    assert.ok(
-      eastWallPhotos.every(
-        (photo) =>
-          Math.abs(
-            photo.position.x -
-              (COTTAGE_INTERIOR_NAVIGATION.maxX -
-                COTTAGE_FLOWER_GARDEN_LAYOUT.cottage.centerX -
-                0.027),
-          ) < 0.000_001,
-      ),
-    )
-    assert.ok(eastWallPhotos.every((photo) => photo.position.y === 1.84))
-    assert.deepEqual(
-      eastWallPhotos.map((photo) => photo.position.z).sort((a, b) => a - b),
-      [-0.72, 0.12, 0.96],
+      photos.map((photo) => photo.parameters.photoSlotId).sort(),
+      [...COTTAGE_INTERIOR_PHOTO_SLOT_IDS].sort(),
     )
     const bookcase = defaults.find(
       (instance) => instance.partId === 'cottage-bookcase',
@@ -311,15 +315,6 @@ describe('花海小院室内实例文档', () => {
       [3.49, -1.8, -Math.PI / 2],
     )
     assert.equal(bookcase.parameters.shelfCount, 4)
-    const bookcaseHalfZ = Number(bookcase.parameters.width) / 2
-    const nearestPhoto = eastWallPhotos.reduce((nearest, photo) =>
-      photo.position.z < nearest.position.z ? photo : nearest,
-    )
-    const nearestPhotoHalfZ = Number(nearestPhoto.parameters.width) / 2_000
-    assert.ok(
-      nearestPhoto.position.z - nearestPhotoHalfZ >
-        bookcase.position.z + bookcaseHalfZ,
-    )
     assert.equal(
       defaults.some((instance) => instance.partId === 'cottage-single-bed'),
       false,
@@ -361,6 +356,20 @@ describe('花海小院室内实例文档', () => {
         ?.position,
       { x: -0.12, y: tabletopY, z: 0.18 },
     )
+    const candle = defaults.find(
+      (instance) => instance.partId === 'cottage-candle',
+    )
+    assert.deepEqual(candle?.position, { x: -0.04, y: tabletopY, z: -0.18 })
+    assert.deepEqual(
+      [candle?.parameters.diameter, candle?.parameters.height],
+      [0.09, 0.26],
+    )
+    assert.equal(tablePhoto.parameters.photoSlotId, 'photo-09')
+    assert.equal(
+      Number(tablePhoto.parameters.width) / Number(tablePhoto.parameters.height),
+      2 / 3,
+    )
+    assert.doesNotMatch(cottageInteriorSource, /sleeping-screen/u)
     const stove = defaults.find(
       (instance) => instance.partId === 'cottage-cast-iron-stove',
     )
@@ -453,6 +462,66 @@ describe('花海小院室内实例文档', () => {
     )
   })
 
+  it('旧版默认三蜡烛和分墙相框迁入单蜡烛八联照片墙', () => {
+    const defaults = createDefaultCottageInteriorInstances()
+    const newCandle = defaults.find((item) => item.id === 'interior-instance-008')
+    const newHero = defaults.find((item) => item.id === 'interior-instance-012')
+    const newSidePhoto = defaults.find((item) => item.id === 'interior-instance-017')
+    assert.ok(newCandle && newHero && newSidePhoto)
+    const heroParameters = { ...newHero.parameters }
+    const sideParameters = { ...newSidePhoto.parameters }
+    delete heroParameters.photoSlotId
+    delete sideParameters.photoSlotId
+    const photoZ = newHero.position.z
+    const eastPhotoX =
+      COTTAGE_INTERIOR_NAVIGATION.maxX -
+      COTTAGE_FLOWER_GARDEN_LAYOUT.cottage.centerX -
+      0.027
+    const legacy = [
+      {
+        ...newCandle,
+        position: { x: -0.1, y: newCandle.position.y, z: -0.17 },
+        parameters: { ...newCandle.parameters, diameter: 0.065, height: 0.19 },
+      },
+      {
+        ...newCandle,
+        id: 'interior-instance-009',
+        position: { x: 0.02, y: newCandle.position.y, z: -0.24 },
+        parameters: { ...newCandle.parameters, diameter: 0.055, height: 0.14 },
+      },
+      {
+        ...newCandle,
+        id: 'interior-instance-010',
+        position: { x: 0.15, y: newCandle.position.y, z: -0.16 },
+        parameters: { ...newCandle.parameters, diameter: 0.05, height: 0.11 },
+      },
+      {
+        ...newHero,
+        position: { x: 0, y: 1.74, z: photoZ },
+        parameters: { ...heroParameters, width: 1180, height: 740 },
+      },
+      {
+        ...newSidePhoto,
+        position: { x: eastPhotoX, y: 1.84, z: -0.72 },
+        rotation: { ...newSidePhoto.rotation, y: -Math.PI / 2 },
+        parameters: { ...sideParameters, width: 380, height: 520 },
+      },
+    ]
+    const migrated = migrateLegacyDefaultCottageInteriorInstances(legacy)
+    assert.ok(Array.isArray(migrated))
+    assert.equal(migrated.some((item) => item.id === 'interior-instance-009'), false)
+    assert.equal(migrated.some((item) => item.id === 'interior-instance-010'), false)
+    assert.deepEqual(
+      migrated.find((item) => item.id === newCandle.id),
+      newCandle,
+    )
+    assert.deepEqual(migrated.find((item) => item.id === newHero.id), newHero)
+    assert.deepEqual(
+      migrated.find((item) => item.id === newSidePhoto.id),
+      newSidePhoto,
+    )
+  })
+
   it('按零件约束修复脏参数，并拒绝退化为同一点的彩灯路径', () => {
     assert.deepEqual(
       normalizeCottageInteriorPartParameters('cottage-single-bed', {
@@ -470,7 +539,7 @@ describe('花海小院室内实例文档', () => {
         matWidth: 999_999,
         mount: 'ceiling',
       }),
-      { width: 1200, height: 240, matWidth: 40, mount: 'wall' },
+      { width: 1600, height: 240, matWidth: 40, mount: 'wall' },
     )
     const lights = COTTAGE_INTERIOR_DEFAULT_DOCUMENT.instances.find(
       (instance) => instance.partId === 'cottage-string-lights',
@@ -488,12 +557,15 @@ describe('花海小院室内实例文档', () => {
   })
 
   it('损坏数据回退默认，v1 按归一化房间坐标迁移，合法空布局保持为空', () => {
-    assert.equal(parseCottageInteriorDocument('{broken').instances.length, 21)
+    assert.equal(
+      parseCottageInteriorDocument('{broken').instances.length,
+      COTTAGE_INTERIOR_DEFAULT_DOCUMENT.instances.length,
+    )
     assert.equal(
       parseCottageInteriorDocument(
         JSON.stringify({ schemaVersion: 0, sceneId: 'cottage-flower-garden' }),
       ).instances.length,
-      21,
+      COTTAGE_INTERIOR_DEFAULT_DOCUMENT.instances.length,
     )
     assert.deepEqual(
       parseCottageInteriorDocument(
@@ -551,15 +623,18 @@ describe('花海小院室内实例文档', () => {
     )
   })
 
-  it('北墙与东墙相框分别吸附正确墙面并朝向室内', () => {
+  it('照片墙默认全部位于北墙，同时仍支持自定义吸附到东墙', () => {
     const photos = createDefaultCottageInteriorInstances().filter(
       (instance) =>
         instance.partId === 'cottage-photo-frame' &&
         instance.parameters.mount === 'wall',
     )
     const northPhoto = photos.find((photo) => photo.rotation.y === 0)
-    const eastPhoto = photos.find((photo) => photo.rotation.y === -Math.PI / 2)
-    assert.ok(northPhoto && eastPhoto)
+    assert.ok(northPhoto)
+    const eastPhoto = {
+      ...northPhoto,
+      rotation: { ...northPhoto.rotation, y: -Math.PI / 2 },
+    }
     assert.equal(resolveCottageWallPhotoSurface(0.12), 'north')
     assert.equal(resolveCottageWallPhotoSurface(-1.42), 'east')
 
@@ -865,5 +940,9 @@ describe('花海小院室内编辑器集成', () => {
     )
     assert.match(interiorWorldSource, /const detailedInteriorVisible/u)
     assert.match(interiorWorldSource, /\{detailedInteriorVisible && children\}/u)
+    assert.match(
+      interiorWorldSource,
+      /portalSnapshot\.zone !== "interior" \|\| portalSnapshot\.visualOpen/u,
+    )
   })
 })

@@ -8,19 +8,82 @@ import { hashContent } from '../security'
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 const MAX_INPUT_PIXELS = 28_000_000
 const MAX_PHOTO_COUNT = 9
+const MAX_STORED_PHOTO_COUNT = MAX_PHOTO_COUNT * 2
 
-export async function createPhotoAsset(projectId: string, file: File) {
+const isPublishedAsset = async (projectId: string, assetId: string) => {
+  const published = await queryDatabase<{ referenced: boolean }>(
+    `select exists (
+       select 1 from projects p
+       join project_revisions r on r.id = p.published_revision_id
+       cross join lateral jsonb_array_elements(r.config->'gallery') photo
+       where p.id = $1 and photo->>'assetId' = $2
+     ) as referenced`,
+    [projectId, assetId],
+  )
+  return Boolean(published.rows[0]?.referenced)
+}
+
+const removeStoredAsset = async (projectId: string, assetId: string) => {
+  const result = await queryDatabase<{ object_key: string }>(
+    `update assets set status = 'deleted'
+      where id = $1 and project_id = $2 and status = 'ready'
+      returning object_key`,
+    [assetId, projectId],
+  )
+  const objectKey = result.rows[0]?.object_key
+  if (!objectKey) return false
+  await deleteObject(objectKey)
+  return true
+}
+
+export async function createPhotoAsset(
+  projectId: string,
+  file: File,
+  replaceAssetId?: string,
+) {
   if (!file.type.startsWith('image/')) throw new Error('只支持图片文件')
   if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
     throw new Error('单张图片必须小于 10 MB')
+  }
+  const projectResult = await queryDatabase<{
+    selected_count: number
+    replacement_allowed: boolean
+  }>(
+    `select jsonb_array_length(coalesce(p.draft_config->'gallery', '[]'::jsonb)) as selected_count,
+            case when $2::text is null then false else exists (
+              select 1
+                from jsonb_array_elements(coalesce(p.draft_config->'gallery', '[]'::jsonb)) photo
+                join assets a on a.id::text = photo->>'assetId'
+               where photo->>'assetId' = $2
+                 and a.project_id = p.id
+                 and a.kind = 'photo'
+                 and a.status = 'ready'
+            ) end as replacement_allowed
+       from projects p
+      where p.id = $1`,
+    [projectId, replaceAssetId ?? null],
+  )
+  const project = projectResult.rows[0]
+  if (!project) throw new Error('项目不存在')
+  if (replaceAssetId && !project.replacement_allowed) {
+    throw new Error('只能替换当前草稿中正在使用的照片')
+  }
+  if (!replaceAssetId && Number(project.selected_count) >= MAX_PHOTO_COUNT) {
+    throw new Error('每座小院最多上传 9 张照片')
   }
   const countResult = await queryDatabase<{ count: string }>(
     `select count(*)::text as count from assets
       where project_id = $1 and kind = 'photo' and status = 'ready'`,
     [projectId],
   )
-  if (Number(countResult.rows[0]?.count ?? 0) >= MAX_PHOTO_COUNT) {
-    throw new Error('每座小院最多上传 9 张照片')
+  const replacingPublishedAsset = replaceAssetId
+    ? await isPublishedAsset(projectId, replaceAssetId)
+    : false
+  if (
+    Number(countResult.rows[0]?.count ?? 0) >= MAX_STORED_PHOTO_COUNT
+    && (!replaceAssetId || replacingPublishedAsset)
+  ) {
+    throw new Error('照片历史版本已满，请先撤下分享并恢复不需要的照片')
   }
 
   const input = Buffer.from(await file.arrayBuffer())
@@ -62,28 +125,36 @@ export async function createPhotoAsset(projectId: string, file: File) {
 }
 
 export async function deletePhotoAsset(projectId: string, assetId: string) {
-  const published = await queryDatabase<{ referenced: boolean }>(
-    `select exists (
-       select 1 from projects p
-       join project_revisions r on r.id = p.published_revision_id
-       cross join lateral jsonb_array_elements(r.config->'gallery') photo
-       where p.id = $1 and photo->>'assetId' = $2
-     ) as referenced`,
-    [projectId, assetId],
-  )
-  if (published.rows[0]?.referenced) {
-    throw new Error('这张照片正在已发布版本中使用，请先撤下分享链接')
-  }
+  if (await isPublishedAsset(projectId, assetId)) return true
+  return removeStoredAsset(projectId, assetId)
+}
+
+export async function pruneInactivePhotoAssets(projectId: string) {
   const result = await queryDatabase<{ object_key: string }>(
-    `update assets set status = 'deleted'
-      where id = $1 and project_id = $2 and status = 'ready'
-      returning object_key`,
-    [assetId, projectId],
+    `update assets a
+        set status = 'deleted'
+       from projects p
+      where a.project_id = p.id
+        and p.id = $1
+        and a.kind = 'photo'
+        and a.status = 'ready'
+        and not exists (
+          select 1
+            from jsonb_array_elements(coalesce(p.draft_config->'gallery', '[]'::jsonb)) photo
+           where photo->>'assetId' = a.id::text
+        )
+        and not exists (
+          select 1
+            from project_revisions r
+            cross join lateral jsonb_array_elements(coalesce(r.config->'gallery', '[]'::jsonb)) photo
+           where r.id = p.published_revision_id
+             and photo->>'assetId' = a.id::text
+        )
+      returning a.object_key`,
+    [projectId],
   )
-  const objectKey = result.rows[0]?.object_key
-  if (!objectKey) return false
-  await deleteObject(objectKey)
-  return true
+  await Promise.all(result.rows.map((row) => deleteObject(row.object_key).catch(() => undefined)))
+  return result.rowCount ?? 0
 }
 
 export async function loadAssetForDelivery(assetId: string) {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { pruneInactivePhotoAssets } from '@/server/projects/assetService'
 import { getEditableProject, updateProjectDraft } from '@/server/projects/projectService'
 import { requireProjectEditor } from '@/server/session'
 import { protectWriteRequest } from '@/server/requestProtection'
@@ -38,6 +39,9 @@ export async function PATCH(
       return NextResponse.json({ message: '草稿版本无效' }, { status: 400 })
     }
     const result = await updateProjectDraft(projectId, body.config, body.version)
+    if (result) {
+      await pruneInactivePhotoAssets(projectId).catch(() => undefined)
+    }
     return result
       ? NextResponse.json(result)
       : NextResponse.json(

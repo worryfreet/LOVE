@@ -27,6 +27,8 @@
 
 `workflow/done/260817-slow-romantic-walk-sky-deploy.md` - 已完成沉浸模式 18 秒院门至屋门直行、2 米玫瑰开放、繁星流星增强、终幕双层文案防遮挡与生产发布；维护自动剧情或浪漫天空时读取。
 
+`workflow/done/260817-unified-photo-wall-door-transition.md` - 已完成标准比例八联照片墙、按实际位置上传与默认回退、单支大蜡烛、格栅移除、双向过门自动关门和开门外景恢复；维护照片定制或门户切换时读取。
+
 `workflow/done/260817-refine-camera-interior.md` - 已完成开局右前方全景机位、前墙/右墙与桌面照片编排、三株绣球花自然摆放及生产发布；复核相同场景时读取。
 
 `workflow/done/260817-refine-cottage-furnishing.md` - 已完成信件内收、绣球花束重排、暖木书柜替换默认床铺及东墙照片避让；维护室内陈设时读取。

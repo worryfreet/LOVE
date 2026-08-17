@@ -1,7 +1,11 @@
 import { z } from 'zod'
 import {
   COTTAGE_INTERIOR_DEFAULT_DOCUMENT,
+  COTTAGE_INTERIOR_PHOTO_SLOT_IDS,
+  isCottageInteriorPhotoSlotId,
+  migrateLegacyDefaultCottageInteriorInstances,
   type CottageInteriorInstance,
+  type CottageInteriorPhotoSlotId,
 } from '@/entities/scene/items/cottage-flower-garden/model/cottageInteriorInstances'
 import {
   applyCottageGardenWeatherPreset,
@@ -27,7 +31,9 @@ const plainText = (maximum: number, multiline = false) =>
   )
 
 function sanitizeInteriorInstances(values: unknown[]) {
-  return values.map((value) => {
+  const migrated = migrateLegacyDefaultCottageInteriorInstances(values)
+  if (!Array.isArray(migrated)) return values
+  return migrated.map((value) => {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return value
     const instance = value as Record<string, unknown>
     const rawParameters = instance.parameters
@@ -61,12 +67,26 @@ export const loveProjectConfigSchema = z.object({
     .array(
       z.object({
         assetId: z.string().uuid(),
-        slotId: z.string().regex(/^photo-(0[1-9])$/u),
+        slotId: z.enum(COTTAGE_INTERIOR_PHOTO_SLOT_IDS),
         focalX: z.number().min(0).max(1),
         focalY: z.number().min(0).max(1),
       }),
     )
-    .max(LOVE_PROJECT_MAX_PHOTOS),
+    .max(LOVE_PROJECT_MAX_PHOTOS)
+    .superRefine((items, context) => {
+      const usedSlots = new Set<CottageInteriorPhotoSlotId>()
+      items.forEach((item, index) => {
+        if (!usedSlots.has(item.slotId)) {
+          usedSlots.add(item.slotId)
+          return
+        }
+        context.addIssue({
+          code: 'custom',
+          path: [index, 'slotId'],
+          message: '每个照片位置只能绑定一张照片',
+        })
+      })
+    }),
   ambience: z.object({
     timeOfDay: z.enum(['dawn', 'noon', 'dusk', 'evening']),
     weatherPreset: z.enum(['clear', 'soft-clouds', 'overcast', 'mist']),
@@ -174,12 +194,18 @@ export function resolveLoveExperienceConfig(
   let photoIndex = 0
   const interiorInstances = baseInstances.map((instance) => {
     if (instance.partId === 'cottage-photo-frame') {
+      const fallbackSlot = COTTAGE_INTERIOR_PHOTO_SLOT_IDS[photoIndex]
       photoIndex += 1
+      const explicitSlot = instance.parameters.photoSlotId
+      const photoSlotId = isCottageInteriorPhotoSlotId(explicitSlot)
+        ? explicitSlot
+        : fallbackSlot
       return {
         ...instance,
         parameters: {
           ...instance.parameters,
-          imageUrl: slotUrl.get(`photo-${String(photoIndex).padStart(2, '0')}`) ?? '',
+          ...(photoSlotId ? { photoSlotId } : {}),
+          imageUrl: photoSlotId ? (slotUrl.get(photoSlotId) ?? '') : '',
         },
       }
     }

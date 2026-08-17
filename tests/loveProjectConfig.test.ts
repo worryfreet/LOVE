@@ -43,6 +43,46 @@ test('照片与情书只从统一项目配置派生到小屋实例', () => {
   assert.equal(envelope?.parameters.letterBody, config.letter.body)
 })
 
+test('照片按明确位置绑定，不受室内实例数组顺序影响', () => {
+  const config = structuredClone(DEFAULT_LOVE_PROJECT_CONFIG)
+  const assetId = '8c0a2d49-c6b4-4dc3-8f98-ce3050b03be5'
+  config.gallery = [{ assetId, slotId: 'photo-08', focalX: 0.5, focalY: 0.5 }]
+  config.interior.instances.reverse()
+  const resolved = resolveLoveExperienceConfig(config, [
+    { assetId, url: `/media/${assetId}` },
+  ])
+  const target = resolved.interiorInstances.find(
+    (item) => item.parameters.photoSlotId === 'photo-08',
+  )
+  const otherPhotos = resolved.interiorInstances.filter(
+    (item) =>
+      item.partId === 'cottage-photo-frame' &&
+      item.parameters.photoSlotId !== 'photo-08',
+  )
+  assert.equal(target?.parameters.imageUrl, `/media/${assetId}`)
+  assert.ok(otherPhotos.every((item) => item.parameters.imageUrl === ''))
+})
+
+test('同一照片位置不能重复绑定', () => {
+  const config = structuredClone(DEFAULT_LOVE_PROJECT_CONFIG)
+  config.gallery = [
+    {
+      assetId: '8c0a2d49-c6b4-4dc3-8f98-ce3050b03be5',
+      slotId: 'photo-03',
+      focalX: 0.5,
+      focalY: 0.5,
+    },
+    {
+      assetId: '6f494027-bc64-43bc-8cde-779bfaef42b3',
+      slotId: 'photo-03',
+      focalX: 0.5,
+      focalY: 0.5,
+    },
+  ]
+  const parsed = loveProjectConfigSchema.safeParse(config)
+  assert.equal(parsed.success, false)
+})
+
 test('时段、天气和玫瑰花色都会进入场景调参', () => {
   const config = structuredClone(DEFAULT_LOVE_PROJECT_CONFIG)
   config.ambience.timeOfDay = 'evening'

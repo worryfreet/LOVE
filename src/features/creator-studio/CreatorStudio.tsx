@@ -7,11 +7,9 @@ import {
   ChevronRight,
   Copy,
   ExternalLink,
-  ImagePlus,
   LayoutTemplate,
   Send,
   Share2,
-  Trash2,
 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -19,8 +17,12 @@ import {
   type LoveProjectConfig,
   type ResolvedLovePhoto,
 } from '@/domain/loveProjectConfig'
-import type { CottageInteriorInstance } from '@/entities/scene'
+import type {
+  CottageInteriorInstance,
+  CottageInteriorPhotoSlotId,
+} from '@/entities/scene'
 import { GardenStageClient } from '@/features/garden-experience/GardenStageClient'
+import { PhotoWallSlotEditor } from '@/features/creator-studio/PhotoWallSlotEditor'
 import { useCottageInteriorEditor } from '@/widgets/scene-editor/model/useCottageInteriorEditor'
 import { CottageInteriorEditorPanel } from '@/widgets/scene-editor/ui/CottageInteriorEditorPanel'
 
@@ -56,7 +58,7 @@ export function CreatorStudio({ initialProject }: { initialProject: CreatorStudi
   const [message, setMessage] = useState<string | null>(null)
   const [published, setPublished] = useState(initialProject.published)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
-  const [uploading, setUploading] = useState(false)
+  const [uploadingSlot, setUploadingSlot] = useState<CottageInteriorPhotoSlotId | null>(null)
   const [credentials, setCredentials] = useState<{
     claimUrl: string
     recoveryCode: string
@@ -135,61 +137,60 @@ export function CreatorStudio({ initialProject }: { initialProject: CreatorStudi
     value: LoveProjectConfig[K],
   ) => setConfig((current) => ({ ...current, [key]: value }))
 
-  const uploadPhotos = async (files: FileList | null) => {
-    if (!files?.length) return
-    setUploading(true)
+  const uploadPhotoForSlot = async (
+    slotId: CottageInteriorPhotoSlotId,
+    file: File,
+  ) => {
+    const currentEntry = config.gallery.find((entry) => entry.slotId === slotId)
+    setUploadingSlot(slotId)
     setMessage(null)
     try {
-      for (const file of Array.from(files).slice(0, 9 - photos.length)) {
-        const form = new FormData()
-        form.set('file', file)
-        const response = await fetch(`/api/projects/${initialProject.id}/assets`, {
-          method: 'POST',
-          body: form,
-        })
-        const asset = (await response.json()) as ResolvedLovePhoto & { message?: string }
-        if (!response.ok) throw new Error(asset.message ?? '照片上传失败')
-        setPhotos((current) => [...current, asset])
-        setConfig((current) => ({
-          ...current,
-          gallery: [
-            ...current.gallery,
-            {
-              assetId: asset.assetId,
-              slotId: `photo-${String(current.gallery.length + 1).padStart(2, '0')}`,
-              focalX: 0.5,
-              focalY: 0.5,
-            },
-          ],
-        }))
-      }
+      if (currentEntry) await persistDraft(config)
+      const form = new FormData()
+      form.set('file', file)
+      if (currentEntry) form.set('replaceAssetId', currentEntry.assetId)
+      const response = await fetch(`/api/projects/${initialProject.id}/assets`, {
+        method: 'POST',
+        body: form,
+      })
+      const asset = (await response.json()) as ResolvedLovePhoto & { message?: string }
+      if (!response.ok) throw new Error(asset.message ?? '照片上传失败')
+      setPhotos((current) => [
+        ...current.filter((photo) => photo.assetId !== currentEntry?.assetId),
+        asset,
+      ])
+      setConfig((current) => ({
+        ...current,
+        gallery: [
+          ...current.gallery.filter((entry) => entry.slotId !== slotId),
+          { assetId: asset.assetId, slotId, focalX: 0.5, focalY: 0.5 },
+        ].sort((left, right) => left.slotId.localeCompare(right.slotId)),
+      }))
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : '照片上传失败')
     } finally {
-      setUploading(false)
+      setUploadingSlot(null)
     }
   }
 
-  const deletePhoto = async (assetId: string) => {
-    const response = await fetch(
-      `/api/projects/${initialProject.id}/assets/${assetId}`,
-      { method: 'DELETE' },
-    )
-    if (!response.ok) {
-      const result = (await response.json().catch(() => null)) as { message?: string } | null
-      setMessage(result?.message ?? '照片删除失败，请稍后重试')
-      return
+  const restoreDefaultPhoto = async (slotId: CottageInteriorPhotoSlotId) => {
+    const entry = config.gallery.find((item) => item.slotId === slotId)
+    if (!entry) return
+    const nextConfig = {
+      ...config,
+      gallery: config.gallery.filter((photo) => photo.slotId !== slotId),
     }
-    setPhotos((current) => current.filter((photo) => photo.assetId !== assetId))
-    setConfig((current) => ({
-      ...current,
-      gallery: current.gallery
-        .filter((photo) => photo.assetId !== assetId)
-        .map((photo, index) => ({
-          ...photo,
-          slotId: `photo-${String(index + 1).padStart(2, '0')}`,
-        })),
-    }))
+    setUploadingSlot(slotId)
+    setMessage(null)
+    try {
+      await persistDraft(nextConfig)
+      setPhotos((current) => current.filter((photo) => photo.assetId !== entry.assetId))
+      setConfig(nextConfig)
+    } catch (reason) {
+      setMessage(reason instanceof Error ? reason.message : '恢复默认照片失败')
+    } finally {
+      setUploadingSlot(null)
+    }
   }
 
   const publish = async () => {
@@ -255,26 +256,6 @@ export function CreatorStudio({ initialProject }: { initialProject: CreatorStudi
     window.location.assign('/?deleted=1')
   }
 
-  const orderedPhotos = config.gallery
-    .map((item) => photos.find((photo) => photo.assetId === item.assetId))
-    .filter((photo): photo is ResolvedLovePhoto => Boolean(photo))
-
-  const movePhoto = (index: number, offset: number) => {
-    const target = index + offset
-    if (target < 0 || target >= config.gallery.length) return
-    setConfig((current) => {
-      const gallery = [...current.gallery]
-      ;[gallery[index], gallery[target]] = [gallery[target], gallery[index]]
-      return {
-        ...current,
-        gallery: gallery.map((item, itemIndex) => ({
-          ...item,
-          slotId: `photo-${String(itemIndex + 1).padStart(2, '0')}`,
-        })),
-      }
-    })
-  }
-
   const share = async () => {
     if (!shareUrl) return
     if (navigator.share) {
@@ -293,7 +274,7 @@ export function CreatorStudio({ initialProject }: { initialProject: CreatorStudi
   const go = (offset: number) => setStep(STEPS[Math.max(0, Math.min(4, stepIndex + offset))].id)
 
   return (
-    <main className="studio-page" data-interior-edit={editor.open}>
+    <main className="studio-page" data-interior-edit={editor.open} data-step={step}>
       <div className="studio-stage">
         <GardenStageClient
           config={renderConfig}
@@ -353,23 +334,13 @@ export function CreatorStudio({ initialProject }: { initialProject: CreatorStudi
 
             {step === 'photos' && (
               <StudioSection eyebrow="02 · MEMORIES" title="把回忆挂进小屋">
-                <p className="section-note">最多 9 张。上传后会自动纠正方向、压缩并移除拍摄信息。</p>
-                <label className="photo-upload">
-                  <ImagePlus size={22} />
-                  <span>{uploading ? '正在处理照片…' : '选择照片'}</span>
-                  <small>{photos.length} / 9</small>
-                  <input type="file" accept="image/*" multiple disabled={uploading || photos.length >= 9} onChange={(event) => void uploadPhotos(event.target.files)} />
-                </label>
-                <div className="photo-grid">
-                  {orderedPhotos.map((photo, index) => (
-                    <figure key={photo.assetId}>
-                      <img src={photo.url} alt={`回忆照片 ${index + 1}`} />
-                      <figcaption>相框 {index + 1}</figcaption>
-                      <button className="photo-delete" type="button" onClick={() => void deletePhoto(photo.assetId)} aria-label={`删除照片 ${index + 1}`}><Trash2 size={14} /></button>
-                      <div className="photo-order"><button type="button" disabled={index === 0} onClick={() => movePhoto(index, -1)} aria-label="向前移动"><ChevronLeft size={12} /></button><button type="button" disabled={index === orderedPhotos.length - 1} onClick={() => movePhoto(index, 1)} aria-label="向后移动"><ChevronRight size={12} /></button></div>
-                    </figure>
-                  ))}
-                </div>
+                <PhotoWallSlotEditor
+                  gallery={config.gallery}
+                  photos={photos}
+                  uploadingSlot={uploadingSlot}
+                  onUpload={uploadPhotoForSlot}
+                  onRestoreDefault={restoreDefaultPhoto}
+                />
               </StudioSection>
             )}
 

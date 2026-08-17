@@ -342,7 +342,13 @@ export function GardenExperience({
       </Canvas>
       <GardenSceneLoadingVeil
         visible={!initialSceneReady || interiorPreparing}
-        phase={initialSceneReady ? 'interior' : 'garden'}
+        phase={
+          !initialSceneReady
+            ? 'garden'
+            : portalSnapshot.zone === 'interior'
+              ? 'exterior'
+              : 'interior'
+        }
       />
       {storySnapshot.phase === 'free' && mode !== 'studio' && (
         <div className={styles.hint}>

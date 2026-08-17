@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { pruneInactivePhotoAssets } from '@/server/projects/assetService'
 import { publishProject, unpublishProject } from '@/server/projects/projectService'
 import { requireProjectEditor } from '@/server/session'
 import { protectWriteRequest } from '@/server/requestProtection'
@@ -17,6 +18,7 @@ export async function POST(
       return NextResponse.json({ message: '编辑会话无效' }, { status: 401 })
     }
     const result = await publishProject(projectId)
+    if (result) await pruneInactivePhotoAssets(projectId)
     return result
       ? NextResponse.json({ ...result, shareUrl: `/s/${result.publicSlug}` })
       : NextResponse.json({ message: '项目不存在' }, { status: 404 })
@@ -38,7 +40,10 @@ export async function DELETE(
   if (!(await requireProjectEditor(projectId))) {
     return NextResponse.json({ message: '编辑会话无效' }, { status: 401 })
   }
-  return (await unpublishProject(projectId))
-    ? new Response(null, { status: 204 })
-    : NextResponse.json({ message: '项目不存在' }, { status: 404 })
+  const unpublished = await unpublishProject(projectId)
+  if (!unpublished) {
+    return NextResponse.json({ message: '项目不存在' }, { status: 404 })
+  }
+  await pruneInactivePhotoAssets(projectId)
+  return new Response(null, { status: 204 })
 }

@@ -218,7 +218,7 @@ function NorthGableLining({ castShadow }: { castShadow: boolean }) {
   )
 }
 
-function CottageInteriorStoryDetails({ cutaway }: { cutaway: boolean }) {
+function CottageInteriorStoryDetails() {
   const { floorTop, eaveHeight, minZ } = COTTAGE_INTERIOR_KIT.measurements
   const { wood } = useGardenMaterialTextures()
   return (
@@ -227,7 +227,7 @@ function CottageInteriorStoryDetails({ cutaway }: { cutaway: boolean }) {
       userData={{
         semanticId: 'cottage.interior.story-details',
         narrative:
-          'memory-table-hearth-sleeping-nook-reading-corner-houseplant',
+          'memory-table-hearth-reading-library-houseplant',
       }}
     >
       <group
@@ -367,29 +367,6 @@ function CottageInteriorStoryDetails({ cutaway }: { cutaway: boolean }) {
         <torusGeometry args={[0.68, 0.025, 10, 64]} />
         <meshStandardMaterial color="#e0b89b" roughness={0.96} />
       </mesh>
-      {!cutaway && (
-        <group
-          name="cottage.interior.sleeping-screen"
-          position={[1.36, floorTop, -1.78]}
-          userData={{ semanticId: 'zone.cottage-sleeping-nook.screen' }}
-        >
-          {Array.from({ length: 7 }, (_, index) => (
-            <mesh
-              key={index}
-              position={[0, 0.86, -0.72 + index * 0.24]}
-              castShadow
-              receiveShadow
-            >
-              <boxGeometry args={[0.052, 1.72, 0.13]} />
-              <meshStandardMaterial color="#745038" roughness={0.9} />
-            </mesh>
-          ))}
-          <mesh position={[0, 1.67, 0]} castShadow>
-            <boxGeometry args={[0.075, 0.08, 1.62]} />
-            <meshStandardMaterial color="#60412e" roughness={0.9} />
-          </mesh>
-        </group>
-      )}
       <group
         name="cottage.interior.pendant"
         position={[0.25, eaveHeight - 0.1, 0.15]}
@@ -482,7 +459,7 @@ export function CottageInterior({
         ),
       )}
       <NorthGableLining castShadow={!cutaway} />
-      <CottageInteriorStoryDetails cutaway={cutaway} />
+      <CottageInteriorStoryDetails />
       <pointLight
         name="cottage.interior.ambient-warmth"
         position={[0, 2.22, 0.15]}

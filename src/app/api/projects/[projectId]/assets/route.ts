@@ -17,11 +17,18 @@ export async function POST(
   }
   const form = await request.formData()
   const file = form.get('file')
+  const replaceAssetId = form.get('replaceAssetId')
   if (!(file instanceof File)) {
     return NextResponse.json({ message: '请选择图片文件' }, { status: 400 })
   }
+  if (replaceAssetId !== null && typeof replaceAssetId !== 'string') {
+    return NextResponse.json({ message: '替换照片参数无效' }, { status: 400 })
+  }
   try {
-    return NextResponse.json(await createPhotoAsset(projectId, file), { status: 201 })
+    return NextResponse.json(
+      await createPhotoAsset(projectId, file, replaceAssetId || undefined),
+      { status: 201 },
+    )
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : '图片上传失败' },

@@ -25,6 +25,7 @@ export {
   COTTAGE_INTERIOR_MAX_EMBEDDED_PHOTO_CHARACTERS,
   COTTAGE_INTERIOR_MAX_PATH_POINTS,
   COTTAGE_INTERIOR_MAX_PHOTOS,
+  COTTAGE_INTERIOR_PHOTO_SLOT_IDS,
   COTTAGE_INTERIOR_PART_IDS,
   COTTAGE_INTERIOR_LEGACY_STORAGE_KEY,
   COTTAGE_INTERIOR_STORAGE_KEY,
@@ -32,6 +33,8 @@ export {
   duplicateCottageInteriorInstance,
   getNextCottageInteriorSequence,
   hasCottageInteriorRenderablePath,
+  isCottageInteriorPhotoSlotId,
+  migrateLegacyDefaultCottageInteriorInstances,
   normalizeCottageInteriorPartParameters,
   parseCottageInteriorDocument,
 } from './items/cottage-flower-garden/model/cottageInteriorInstances'
@@ -39,6 +42,7 @@ export type {
   CottageInteriorInstance,
   CottageInteriorParameters,
   CottageInteriorPartId,
+  CottageInteriorPhotoSlotId,
   CottageInteriorPoint,
 } from './items/cottage-flower-garden/model/cottageInteriorInstances'
 export {

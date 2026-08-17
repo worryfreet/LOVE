@@ -62,7 +62,8 @@ export function CottageFlowerGardenWorld({
     cottagePortalRuntime.getSnapshot,
   );
   const exteriorHighDensityVisible =
-    !interiorEditMode && portalSnapshot.zone !== "interior";
+    !interiorEditMode &&
+    (portalSnapshot.zone !== "interior" || portalSnapshot.visualOpen);
   const detailedInteriorVisible =
     interiorEditMode ||
     portalSnapshot.visualOpen ||

@@ -14,6 +14,7 @@ import {
   cottagePortalRuntime,
   isCottageDoorObserverEligible,
   type CottageDoorMotion,
+  type CottageExperienceZone,
 } from '../model/cottagePortalMachine'
 import {
   COTTAGE_GARDEN_TUNING_DEFAULTS,
@@ -209,6 +210,7 @@ export function CottageDoorPortal({
   const cameraDirection = useRef(new Vector3())
   const [eligible, setEligible] = useState(false)
   const [motion, setMotion] = useState<CottageDoorMotion>('closed')
+  const [zone, setZone] = useState<CottageExperienceZone>('exterior')
   const { envelope, door } = COTTAGE_ARCHITECTURE
   const frontZ = envelope.depth / 2
   const hingeX = -door.clearWidth / 2 + 0.02
@@ -236,7 +238,9 @@ export function CottageDoorPortal({
   useEffect(
     () =>
       cottagePortalRuntime.subscribe(() => {
-        setMotion(cottagePortalRuntime.getSnapshot().motion)
+        const snapshot = cottagePortalRuntime.getSnapshot()
+        setMotion(snapshot.motion)
+        setZone(snapshot.zone)
       }),
     [],
   )
@@ -255,7 +259,11 @@ export function CottageDoorPortal({
   })
 
   const actionLabel =
-    motion === 'closed' || motion === 'closing' ? '打开小屋' : '关上房门'
+    motion === 'closed' || motion === 'closing'
+      ? zone === 'interior'
+        ? '打开房门'
+        : '打开小屋'
+      : '关上房门'
 
   return (
     <group

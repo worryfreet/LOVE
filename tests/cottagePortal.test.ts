@@ -77,6 +77,9 @@ describe('写实小屋建筑权威与门户事务', () => {
   it('关门前拒绝门扇扫掠体内的访客，并拒绝 reset 前的旧写入', () => {
     const { envelope } = COTTAGE_ARCHITECTURE
     const frontZ = envelope.centerZ + envelope.depth / 2
+    cottagePortalRuntime.reset()
+    assert.equal(cottagePortalRuntime.requestOpen([0, 1.65, frontZ + 1]), true)
+    for (let index = 0; index < 18; index += 1) cottagePortalRuntime.tick(0.05)
     assert.equal(isCottageDoorSweepBlocked([-0.2, 1.65, frontZ - 0.3]), true)
     assert.equal(
       cottagePortalRuntime.requestClose([-0.2, 1.65, frontZ - 0.3]),
@@ -92,6 +95,58 @@ describe('写实小屋建筑权威与门户事务', () => {
       false,
     )
     assert.equal(cottagePortalRuntime.getSnapshot().motion, 'closed')
+  })
+
+  it('从室外进入后越过门扇扫掠区自动关门，未真正穿门时保持开启', () => {
+    const { envelope, door } = COTTAGE_ARCHITECTURE
+    const frontZ = envelope.centerZ + envelope.depth / 2
+    const outside = [envelope.centerX, 1.65, frontZ + 1] as const
+    const threshold = [envelope.centerX, 1.65, frontZ] as const
+    const shallowInterior = [
+      envelope.centerX,
+      1.65,
+      frontZ - door.thresholdDepth - 0.05,
+    ] as const
+    const safeInterior = [
+      envelope.centerX,
+      1.65,
+      frontZ - door.clearWidth - 0.5,
+    ] as const
+
+    cottagePortalRuntime.reset()
+    cottagePortalRuntime.updateZoneFromPosition(outside)
+    assert.equal(cottagePortalRuntime.requestOpen(outside), true)
+    for (let index = 0; index < 18; index += 1) cottagePortalRuntime.tick(0.05)
+    cottagePortalRuntime.updateZoneFromPosition(outside)
+    assert.equal(cottagePortalRuntime.getSnapshot().motion, 'open')
+    cottagePortalRuntime.updateZoneFromPosition(threshold)
+    cottagePortalRuntime.updateZoneFromPosition(shallowInterior)
+    assert.equal(cottagePortalRuntime.getSnapshot().zone, 'interior')
+    assert.equal(cottagePortalRuntime.getSnapshot().motion, 'open')
+    cottagePortalRuntime.updateZoneFromPosition(safeInterior)
+    assert.equal(cottagePortalRuntime.getSnapshot().motion, 'closing')
+    for (let index = 0; index < 15; index += 1) cottagePortalRuntime.tick(0.05)
+    assert.equal(cottagePortalRuntime.getSnapshot().motion, 'closed')
+    assert.equal(cottagePortalRuntime.getSnapshot().zone, 'interior')
+  })
+
+  it('从室内按 E 开门离开后，在室外一侧自动关门', () => {
+    const { envelope } = COTTAGE_ARCHITECTURE
+    const frontZ = envelope.centerZ + envelope.depth / 2
+    const inside = [envelope.centerX, 1.65, envelope.centerZ] as const
+    const threshold = [envelope.centerX, 1.65, frontZ] as const
+    const outside = [envelope.centerX, 1.65, frontZ + 0.8] as const
+
+    cottagePortalRuntime.reset()
+    cottagePortalRuntime.updateZoneFromPosition(inside)
+    assert.equal(cottagePortalRuntime.requestOpen(inside), true)
+    for (let index = 0; index < 18; index += 1) cottagePortalRuntime.tick(0.05)
+    cottagePortalRuntime.updateZoneFromPosition(threshold)
+    cottagePortalRuntime.updateZoneFromPosition(outside)
+    assert.equal(cottagePortalRuntime.getSnapshot().motion, 'closing')
+    for (let index = 0; index < 15; index += 1) cottagePortalRuntime.tick(0.05)
+    assert.equal(cottagePortalRuntime.getSnapshot().motion, 'closed')
+    assert.equal(cottagePortalRuntime.getSnapshot().zone, 'exterior')
   })
 
   it('跨过带滞回门槛后进入室内层并平滑提高室内权重', () => {

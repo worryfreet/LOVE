@@ -34,7 +34,7 @@ export interface CoverUvTransform {
 
 const FRAME_LIMITS = {
   minWidth: 0.12,
-  maxWidth: 1.2,
+  maxWidth: 1.6,
   minHeight: 0.15,
   maxHeight: 1.5,
 } as const
