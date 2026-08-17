@@ -7,6 +7,7 @@ import {
   type ModelParameterValues,
 } from '@/entities/model'
 import {
+  CottageBookcase,
   CottageCandle,
   CottageCastIronStove,
   CottageLoveseatSofa,
@@ -22,6 +23,7 @@ import {
 import {
   COTTAGE_FLOWER_GARDEN_LAYOUT,
   COTTAGE_TABLE_HYDRANGEA_OCCURRENCES,
+  COTTAGE_TABLE_HYDRANGEA_VASE,
   cottagePortalRuntime,
   getCottageInteriorInstanceBounds,
   type CottageInteriorInstance,
@@ -46,6 +48,7 @@ function isCottageDoorwayPreviewPart(instance: CottageInteriorInstance) {
     instance.partId === 'cottage-round-table' ||
     instance.partId === 'cottage-wood-chair' ||
     instance.partId === 'cottage-low-cabinet' ||
+    instance.partId === 'cottage-bookcase' ||
     instance.partId === 'cottage-candle' ||
     instance.partId === 'cottage-envelope' ||
     instance.partId === 'cottage-photo-frame'
@@ -99,8 +102,19 @@ function DefaultTableHydrangeas({
         occurrenceCount: COTTAGE_TABLE_HYDRANGEA_OCCURRENCES.length,
       }}
     >
-      <mesh position={[0, 0.055, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.055, 0.044, 0.11, 18]} />
+      <mesh
+        position={[0, COTTAGE_TABLE_HYDRANGEA_VASE.bodyHeight / 2, 0]}
+        castShadow
+        receiveShadow
+      >
+        <cylinderGeometry
+          args={[
+            COTTAGE_TABLE_HYDRANGEA_VASE.topRadius,
+            COTTAGE_TABLE_HYDRANGEA_VASE.bottomRadius,
+            COTTAGE_TABLE_HYDRANGEA_VASE.bodyHeight,
+            18,
+          ]}
+        />
         <meshPhysicalMaterial
           color="#d9c6aa"
           roughness={0.32}
@@ -108,8 +122,15 @@ function DefaultTableHydrangeas({
           clearcoatRoughness={0.28}
         />
       </mesh>
-      <mesh position={[0, 0.105, 0]}>
-        <torusGeometry args={[0.052, 0.008, 8, 18]} />
+      <mesh position={[0, COTTAGE_TABLE_HYDRANGEA_VASE.lipY, 0]}>
+        <torusGeometry
+          args={[
+            COTTAGE_TABLE_HYDRANGEA_VASE.lipRadius,
+            COTTAGE_TABLE_HYDRANGEA_VASE.lipTube,
+            8,
+            18,
+          ]}
+        />
         <meshStandardMaterial color="#bca489" roughness={0.52} />
       </mesh>
       {COTTAGE_TABLE_HYDRANGEA_OCCURRENCES.map((occurrence) => (
@@ -186,6 +207,8 @@ function InteriorPartVisual({
       return <CottageWoodChair id={id} parameters={parameters} quality={quality} />
     case 'cottage-low-cabinet':
       return <CottageLowCabinet id={id} parameters={parameters} quality={quality} />
+    case 'cottage-bookcase':
+      return <CottageBookcase id={id} parameters={parameters} quality={quality} />
     case 'cottage-candle':
       return <CottageCandle id={id} parameters={parameters} quality={quality} />
     case 'cottage-envelope':
@@ -404,6 +427,7 @@ export function CottageInteriorRuntime({
   transformMode,
   selectedPathPointIndex,
   quality,
+  letterInteractionEnabled = true,
   onSelect,
   onPathPointSelect,
   onCommitTransform,
@@ -416,6 +440,7 @@ export function CottageInteriorRuntime({
   transformMode: CottageInteriorTransformMode
   selectedPathPointIndex: number | null
   quality: 'desktop' | 'mobile'
+  letterInteractionEnabled?: boolean
   onSelect: (instanceId: string) => void
   onPathPointSelect: (index: number | null) => void
   onCommitTransform: (
@@ -479,7 +504,9 @@ export function CottageInteriorRuntime({
               }
               quality={quality}
               letterInteractionEnabled={
-                !editMode && portalSnapshot.zone === 'interior'
+                letterInteractionEnabled &&
+                !editMode &&
+                portalSnapshot.zone === 'interior'
               }
               onSelect={onSelect}
               onPathPointSelect={onPathPointSelect}

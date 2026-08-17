@@ -13,6 +13,8 @@ import {
 
 interface FirstPersonControllerProps {
   config: FirstPersonConfig
+  enabled?: boolean
+  preserveViewOnEnable?: boolean
   initialView?: {
     position: readonly [number, number, number]
     target: readonly [number, number, number]
@@ -27,6 +29,8 @@ interface ActivePointer {
 
 export function FirstPersonController({
   config,
+  enabled = true,
+  preserveViewOnEnable = false,
   initialView,
 }: FirstPersonControllerProps) {
   const { camera, gl } = useThree()
@@ -41,6 +45,12 @@ export function FirstPersonController({
   useEffect(() => {
     const activeKeys = pressed.current
     const pointerStates = activePointers.current
+    if (!enabled) {
+      activeKeys.clear()
+      pointerStates.clear()
+      touchMovement.current = { forward: 0, strafe: 0 }
+      return
+    }
     const initialPosition: readonly [number, number, number] =
       initialView?.position ?? [
         config.spawn[0],
@@ -59,15 +69,19 @@ export function FirstPersonController({
           config.spawn[1] - 0.04,
           config.spawn[2] - 1,
         ]
-    camera.position.set(...initialPosition)
-    camera.lookAt(...initialTarget)
-    direction.current
-      .set(
-        initialTarget[0] - initialPosition[0],
-        initialTarget[1] - initialPosition[1],
-        initialTarget[2] - initialPosition[2],
-      )
-      .normalize()
+    if (preserveViewOnEnable) {
+      camera.getWorldDirection(direction.current)
+    } else {
+      camera.position.set(...initialPosition)
+      camera.lookAt(...initialTarget)
+      direction.current
+        .set(
+          initialTarget[0] - initialPosition[0],
+          initialTarget[1] - initialPosition[1],
+          initialTarget[2] - initialPosition[2],
+        )
+        .normalize()
+    }
     yaw.current = Math.atan2(-direction.current.x, -direction.current.z)
     pitch.current = Math.asin(
       MathUtils.clamp(direction.current.y, -1, 1),
@@ -272,9 +286,10 @@ export function FirstPersonController({
       document.removeEventListener('mousemove', handleLockedMouseMove)
       document.removeEventListener('pointerlockchange', handlePointerLockChange)
     }
-  }, [camera, config, gl, initialView])
+  }, [camera, config, enabled, gl, initialView, preserveViewOnEnable])
 
   useFrame((_, delta) => {
+    if (!enabled) return
     camera.rotation.set(pitch.current, yaw.current, 0, 'YXZ')
 
     const forward =

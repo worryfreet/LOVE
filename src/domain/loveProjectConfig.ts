@@ -13,6 +13,8 @@ import { sanitizePlainText } from '@/shared/lib'
 
 export const LOVE_PROJECT_SCHEMA_VERSION = 1 as const
 export const LOVE_PROJECT_MAX_PHOTOS = 9
+export const DEFAULT_LOVE_ENDING_MESSAGE =
+  '这座花园的浪漫先到这里，\n但我想和你的故事，才刚刚开始。'
 
 const plainText = (maximum: number, multiline = false) =>
   z.string().transform((value) =>
@@ -71,6 +73,15 @@ export const loveProjectConfigSchema = z.object({
     skyMessage: plainText(24),
     musicAssetId: z.string().uuid().optional(),
   }),
+  experience: z
+    .object({
+      immersiveEnabled: z.boolean(),
+      endingMessage: plainText(120, true),
+    })
+    .default({
+      immersiveEnabled: true,
+      endingMessage: DEFAULT_LOVE_ENDING_MESSAGE,
+    }),
   garden: z.object({
     rosePaletteId: z.enum([
       'mixed',
@@ -129,6 +140,10 @@ export const DEFAULT_LOVE_PROJECT_CONFIG: LoveProjectConfig = {
     timeOfDay: 'dusk',
     weatherPreset: 'soft-clouds',
     skyMessage: 'I LOVE YOU!',
+  },
+  experience: {
+    immersiveEnabled: true,
+    endingMessage: DEFAULT_LOVE_ENDING_MESSAGE,
   },
   garden: {
     rosePaletteId: 'mixed',

@@ -6,6 +6,7 @@ import {
   COTTAGE_INTERIOR_KIT,
   COTTAGE_INTERIOR_RUNTIME_VISIBILITY,
   COTTAGE_TABLE_HYDRANGEA_OCCURRENCES,
+  COTTAGE_TABLE_HYDRANGEA_VASE,
   createCottageInteriorKit,
   isCottageInteriorRuntimeVisible,
 } from '../src/entities/scene/items/cottage-flower-garden/model/cottageInterior'
@@ -147,20 +148,38 @@ describe('花海小院室内建筑骨架', () => {
       3,
     )
     COTTAGE_TABLE_HYDRANGEA_OCCURRENCES.forEach((occurrence) => {
-      assert.ok(occurrence.scale >= 0.12 && occurrence.scale <= 0.18)
+      assert.ok(occurrence.scale >= 0.1 && occurrence.scale <= 0.15)
       assert.ok(occurrence.position.every(Number.isFinite))
       assert.ok(occurrence.rotation.every(Number.isFinite))
       const stemRoot = new Vector3(0, -1.26, 0.0078)
         .multiplyScalar(occurrence.scale)
         .applyEuler(new Euler(...occurrence.rotation))
         .add(new Vector3(...occurrence.position))
-      assert.ok(Math.hypot(stemRoot.x, stemRoot.z) < 0.018)
+      assert.ok(
+        Math.hypot(stemRoot.x, stemRoot.z) <
+          COTTAGE_TABLE_HYDRANGEA_VASE.rootSafeRadius,
+      )
       assert.ok(stemRoot.y > 0 && stemRoot.y < 0.04)
+      const bloomCenter = new Vector3(0, 0.55, 0.02)
+        .multiplyScalar(occurrence.scale)
+        .applyEuler(new Euler(...occurrence.rotation))
+        .add(new Vector3(...occurrence.position))
+      const lipProgress =
+        (COTTAGE_TABLE_HYDRANGEA_VASE.lipY - stemRoot.y) /
+        (bloomCenter.y - stemRoot.y)
+      const stemAtLip = stemRoot.clone().lerp(bloomCenter, lipProgress)
+      assert.ok(
+        Math.hypot(stemAtLip.x, stemAtLip.z) <
+          COTTAGE_TABLE_HYDRANGEA_VASE.lipRadius -
+            COTTAGE_TABLE_HYDRANGEA_VASE.lipTube,
+      )
     })
-    assert.equal(
-      new Set(COTTAGE_TABLE_HYDRANGEA_OCCURRENCES.map(({ scale }) => scale)).size,
-      3,
-    )
+    const [left, center, right] = COTTAGE_TABLE_HYDRANGEA_OCCURRENCES
+    assert.equal(center.scale, 0.15)
+    assert.ok(Math.abs(left.scale - center.scale * (2 / 3)) < 0.000_001)
+    assert.ok(Math.abs(right.scale - center.scale * (2 / 3)) < 0.000_001)
+    assert.equal(center.rotation[2], 0)
+    assert.ok(left.rotation[2] > 0 && right.rotation[2] < 0)
     const bloomCenters = COTTAGE_TABLE_HYDRANGEA_OCCURRENCES
       .map((occurrence) =>
         new Vector3(0, 0.55, 0.02)
@@ -169,8 +188,8 @@ describe('花海小院室内建筑骨架', () => {
           .add(new Vector3(...occurrence.position)),
       )
       .sort((left, right) => left.x - right.x)
-    assert.ok(bloomCenters[1].x - bloomCenters[0].x > 0.08)
-    assert.ok(bloomCenters[2].x - bloomCenters[1].x > 0.08)
+    assert.ok(bloomCenters[1].x - bloomCenters[0].x > 0.045)
+    assert.ok(bloomCenters[2].x - bloomCenters[1].x > 0.045)
     assert.match(interiorRuntimeSource, /HydrangeaAssembly/)
     assert.match(interiorRuntimeSource, /HYDRANGEA_CUSTOM_CONFIGURATION/)
     assert.match(interiorRuntimeSource, /COTTAGE_TABLE_HYDRANGEA_OCCURRENCES\.map/)
@@ -209,8 +228,8 @@ describe('花海小院室内建筑骨架', () => {
 })
 
 describe('花海小院室内实例文档', () => {
-  it('冻结十类目录零件与九张照片的有序礼物叙事陈设', () => {
-    assert.equal(COTTAGE_INTERIOR_PART_IDS.length, 10)
+  it('冻结十一类目录零件与九张照片的有序礼物叙事陈设', () => {
+    assert.equal(COTTAGE_INTERIOR_PART_IDS.length, 11)
     const defaults = createDefaultCottageInteriorInstances()
     assert.deepEqual(defaults, COTTAGE_INTERIOR_DEFAULT_DOCUMENT.instances)
     const photos = defaults.filter(
@@ -281,13 +300,29 @@ describe('花海小院室内实例文档', () => {
     assert.ok(eastWallPhotos.every((photo) => photo.position.y === 1.84))
     assert.deepEqual(
       eastWallPhotos.map((photo) => photo.position.z).sort((a, b) => a - b),
-      [-1.65, -0.8, 0.05],
+      [-0.72, 0.12, 0.96],
     )
+    const bookcase = defaults.find(
+      (instance) => instance.partId === 'cottage-bookcase',
+    )
+    assert.ok(bookcase)
+    assert.deepEqual(
+      [bookcase.position.x, bookcase.position.z, bookcase.rotation.y],
+      [3.49, -1.8, -Math.PI / 2],
+    )
+    assert.equal(bookcase.parameters.shelfCount, 4)
+    const bookcaseHalfZ = Number(bookcase.parameters.width) / 2
+    const nearestPhoto = eastWallPhotos.reduce((nearest, photo) =>
+      photo.position.z < nearest.position.z ? photo : nearest,
+    )
+    const nearestPhotoHalfZ = Number(nearestPhoto.parameters.width) / 2_000
     assert.ok(
-      defaults.some(
-        (instance) =>
-          instance.partId === 'cottage-single-bed' && instance.position.x > 1,
-      ),
+      nearestPhoto.position.z - nearestPhotoHalfZ >
+        bookcase.position.z + bookcaseHalfZ,
+    )
+    assert.equal(
+      defaults.some((instance) => instance.partId === 'cottage-single-bed'),
+      false,
     )
     const table = defaults.find(
       (instance) => instance.partId === 'cottage-round-table',
@@ -321,6 +356,11 @@ describe('花海小院室内实例文档', () => {
         ?.position.y,
       tabletopY,
     )
+    assert.deepEqual(
+      defaults.find((instance) => instance.partId === 'cottage-envelope')
+        ?.position,
+      { x: -0.12, y: tabletopY, z: 0.18 },
+    )
     const stove = defaults.find(
       (instance) => instance.partId === 'cottage-cast-iron-stove',
     )
@@ -338,10 +378,6 @@ describe('花海小院室内实例文档', () => {
           instance.position.z > 0,
       ),
     )
-    const bed = defaults.find(
-      (instance) => instance.partId === 'cottage-single-bed',
-    )
-    assert.equal(bed?.parameters.width, 1.5)
   })
 
   it('限制照片、彩灯控制点、缩放和未知参数', () => {
@@ -384,6 +420,37 @@ describe('花海小院室内实例文档', () => {
       },
     ])
     assert.equal(oversizedPhoto[0]?.parameters.imageUrl, '')
+  })
+
+  it('旧会话只把未修改的默认床迁移为书柜，保留用户自定义床', () => {
+    const legacyDefaultBed = createCottageInteriorInstance(
+      'cottage-single-bed',
+      1,
+      { width: 1.5, length: 2, bedHeight: 0.48 },
+      { x: 2.45, y: COTTAGE_INTERIOR_NAVIGATION.floorTop, z: -1.62 },
+      1,
+    )
+    const serialize = (instance: typeof legacyDefaultBed) =>
+      JSON.stringify({
+        schemaVersion: 2,
+        sceneId: 'cottage-flower-garden',
+        instances: [instance],
+      })
+
+    assert.equal(
+      parseCottageInteriorDocument(serialize(legacyDefaultBed)).instances[0]
+        ?.partId,
+      'cottage-bookcase',
+    )
+    assert.equal(
+      parseCottageInteriorDocument(
+        serialize({
+          ...legacyDefaultBed,
+          position: { ...legacyDefaultBed.position, z: -1.4 },
+        }),
+      ).instances[0]?.partId,
+      'cottage-single-bed',
+    )
   })
 
   it('按零件约束修复脏参数，并拒绝退化为同一点的彩灯路径', () => {
@@ -550,8 +617,11 @@ describe('花海小院室内实例文档', () => {
 
   it('统一约束复制、落地高度、屋顶净高和桌面承载关系', () => {
     const defaults = createDefaultCottageInteriorInstances()
-    const bed = defaults.find(
-      (instance) => instance.partId === 'cottage-single-bed',
+    const bed = createCottageInteriorInstance(
+      'cottage-single-bed',
+      91,
+      { width: 1.5, length: 2, bedHeight: 0.48 },
+      { x: 2.45, y: COTTAGE_INTERIOR_NAVIGATION.floorTop, z: -1.62 },
     )
     const table = defaults.find(
       (instance) => instance.partId === 'cottage-round-table',
@@ -744,7 +814,7 @@ describe('花海小院室内实例文档', () => {
 })
 
 describe('花海小院室内编辑器集成', () => {
-  it('十类资源都以独立实现进入零件库与场景运行时', async () => {
+  it('十一类资源都以独立实现进入零件库与场景运行时', async () => {
     for (const partId of COTTAGE_INTERIOR_PART_IDS) {
       const implementation = new URL(
         `../src/entities/part/items/${partId}/index.ts`,

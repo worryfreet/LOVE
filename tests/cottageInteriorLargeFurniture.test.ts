@@ -29,6 +29,12 @@ import {
   disposeCottageLowCabinetTextures,
 } from '../src/entities/part/items/cottage-low-cabinet/lib/lowCabinetTextures'
 import { CottageLowCabinet } from '../src/entities/part/items/cottage-low-cabinet/ui/CottageLowCabinet'
+import {
+  createCottageBookcaseBookLayout,
+  DEFAULT_COTTAGE_BOOKCASE_DIMENSIONS,
+  resolveCottageBookcaseDimensions,
+} from '../src/entities/part/items/cottage-bookcase/model/bookcase'
+import { CottageBookcase } from '../src/entities/part/items/cottage-bookcase/ui/CottageBookcase'
 import { cottageInteriorPartCatalogEntries } from '../src/entities/part/model/cottageInteriorPartCatalog'
 
 describe('花海小院大型家具零件', () => {
@@ -83,7 +89,38 @@ describe('花海小院大型家具零件', () => {
     assert.ok(cabinet.cushionHeight > 0)
   })
 
-  it('三个零件都拒绝非有限或越界尺寸', () => {
+  it('书柜从统一包络派生四层隔间和确定性书本陈设', () => {
+    const bookcase = resolveCottageBookcaseDimensions(
+      DEFAULT_COTTAGE_BOOKCASE_DIMENSIONS,
+    )
+    const books = createCottageBookcaseBookLayout(
+      DEFAULT_COTTAGE_BOOKCASE_DIMENSIONS,
+    )
+
+    assert.equal(bookcase.width, 1.35)
+    assert.equal(bookcase.depth, 0.38)
+    assert.equal(bookcase.height, 1.95)
+    assert.equal(bookcase.shelfCount, 4)
+    assert.ok(bookcase.innerWidth < bookcase.width)
+    assert.ok(bookcase.compartmentHeight > 0.35)
+    assert.equal(books.length, 20)
+    assert.deepEqual(
+      [...new Set(books.map((book) => book.shelfIndex))],
+      [0, 1, 2, 3],
+    )
+    assert.ok(
+      books.every(
+        (book) =>
+          book.position[0] - book.width / 2 >=
+            -bookcase.innerWidth / 2 - 0.000_001 &&
+          book.position[0] + book.width / 2 <=
+            bookcase.innerWidth / 2 + 0.000_001 &&
+          book.height < bookcase.compartmentHeight,
+      ),
+    )
+  })
+
+  it('四个零件都拒绝非有限或越界尺寸', () => {
     assert.throws(
       () =>
         resolveCottageSingleBedDimensions({
@@ -108,16 +145,27 @@ describe('花海小院大型家具零件', () => {
         }),
       /矮柜高度必须/,
     )
+    assert.throws(
+      () =>
+        resolveCottageBookcaseDimensions({
+          ...DEFAULT_COTTAGE_BOOKCASE_DIMENSIONS,
+          shelfCount: 4.5,
+        }),
+      /层数必须是整数/,
+    )
   })
 
-  it('目录公开的床与低柜尺寸边界全部落在几何解析器合法范围内', () => {
+  it('目录公开的大型家具尺寸边界全部落在几何解析器合法范围内', () => {
     const bed = cottageInteriorPartCatalogEntries.find(
       (part) => part.id === 'cottage-single-bed',
     )
     const cabinet = cottageInteriorPartCatalogEntries.find(
       (part) => part.id === 'cottage-low-cabinet',
     )
-    assert.ok(bed && cabinet)
+    const bookcase = cottageInteriorPartCatalogEntries.find(
+      (part) => part.id === 'cottage-bookcase',
+    )
+    assert.ok(bed && cabinet && bookcase)
     type CatalogPart = (typeof cottageInteriorPartCatalogEntries)[number]
     const numberParameter = (
       part: CatalogPart,
@@ -131,6 +179,10 @@ describe('花海小院大型家具零件', () => {
     const bedLength = numberParameter(bed, 'length')
     const bedHeight = numberParameter(bed, 'bedHeight')
     const cabinetHeight = numberParameter(cabinet, 'height')
+    const bookcaseWidth = numberParameter(bookcase, 'width')
+    const bookcaseDepth = numberParameter(bookcase, 'depth')
+    const bookcaseHeight = numberParameter(bookcase, 'height')
+    const bookcaseShelfCount = numberParameter(bookcase, 'shelfCount')
 
     assert.doesNotThrow(() =>
       resolveCottageSingleBedDimensions({
@@ -143,6 +195,14 @@ describe('花海小院大型家具零件', () => {
       resolveCottageLowCabinetDimensions({
         ...DEFAULT_COTTAGE_LOW_CABINET_DIMENSIONS,
         height: cabinetHeight.min / 1_000,
+      }),
+    )
+    assert.doesNotThrow(() =>
+      resolveCottageBookcaseDimensions({
+        width: bookcaseWidth.min / 1_000,
+        depth: bookcaseDepth.min / 1_000,
+        height: bookcaseHeight.min / 1_000,
+        shelfCount: bookcaseShelfCount.min,
       }),
     )
   })
@@ -183,7 +243,7 @@ describe('花海小院大型家具零件', () => {
     }
   })
 
-  it('三个公共组件统一接收 PartParameterValues 并保留可选质量等级', () => {
+  it('四个公共组件统一接收 PartParameterValues 并保留可选质量等级', () => {
     const bedProps = {
       parameters: { width: 900 },
       quality: 'desktop',
@@ -196,6 +256,10 @@ describe('花海小院大型家具零件', () => {
       parameters: { variant: 'cushioned-bench' },
       quality: 'desktop',
     } satisfies Parameters<typeof CottageLowCabinet>[0]
+    const bookcaseProps = {
+      parameters: { width: 1350, shelfCount: 4 },
+      quality: 'desktop',
+    } satisfies Parameters<typeof CottageBookcase>[0]
     const contracts = [
       {
         component: CottageSingleBed,
@@ -208,6 +272,10 @@ describe('花海小院大型家具零件', () => {
       {
         component: CottageLowCabinet,
         props: cabinetProps,
+      },
+      {
+        component: CottageBookcase,
+        props: bookcaseProps,
       },
     ]
 

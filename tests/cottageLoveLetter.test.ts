@@ -88,6 +88,8 @@ describe('花海小屋情书体验', () => {
     assert.match(readerSource, /aria-modal="true"/u)
     assert.match(readerSource, /data-love-letter-reader/u)
     assert.match(readerSource, /closeButtonRef\.current\?\.focus/u)
+    assert.match(readerSource, /onKeep = onClose/u)
+    assert.match(readerSource, /onClick=\{onKeep\}/u)
     assert.match(runtimeSource, /document\.exitPointerLock/u)
     assert.match(runtimeSource, /data-love-letter-action/u)
   })

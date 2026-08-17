@@ -63,6 +63,12 @@ export function getCottageInteriorInstanceBounds(
           (parameters.variant === 'cushioned-bench' ? 0.08 : 0),
         readMeters(parameters.depth, 0.46),
       ]
+    case 'cottage-bookcase':
+      return [
+        readMeters(parameters.width, 1.35),
+        readMeters(parameters.height, 1.95),
+        readMeters(parameters.depth, 0.38),
+      ]
     case 'cottage-candle': {
       const diameter = readMeters(parameters.diameter, 0.065)
       const height = readMeters(parameters.height, 0.16)
@@ -103,6 +109,7 @@ const FLOOR_SUPPORTED_PARTS = new Set<CottageInteriorPartId>([
   'cottage-round-table',
   'cottage-wood-chair',
   'cottage-low-cabinet',
+  'cottage-bookcase',
 ])
 
 function clamp(value: number, minimum: number, maximum: number) {

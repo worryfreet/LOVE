@@ -13,6 +13,7 @@ export { CottageCastIronStove } from './items/cottage-cast-iron-stove'
 export { CottageRoundTable } from './items/cottage-round-table'
 export { CottageWoodChair } from './items/cottage-wood-chair'
 export { CottageLowCabinet } from './items/cottage-low-cabinet'
+export { CottageBookcase } from './items/cottage-bookcase'
 export { CottageCandle } from './items/cottage-candle'
 export {
   CottageEnvelope,

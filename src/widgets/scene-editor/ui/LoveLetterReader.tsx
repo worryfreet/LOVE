@@ -7,9 +7,10 @@ import '../styles/cottage-love-letter.css'
 export interface LoveLetterReaderProps {
   content: LoveLetterContent
   onClose: () => void
+  onKeep?: () => void
 }
 
-export function LoveLetterReader({ content, onClose }: LoveLetterReaderProps) {
+export function LoveLetterReader({ content, onClose, onKeep = onClose }: LoveLetterReaderProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const paragraphs = useMemo(
     () => content.body.split(/\n{2,}/gu).filter(Boolean),
@@ -95,7 +96,7 @@ export function LoveLetterReader({ content, onClose }: LoveLetterReaderProps) {
             className="love-letter-paper__keep"
             type="button"
             data-love-letter-close
-            onClick={onClose}
+            onClick={onKeep}
           >
             珍藏这封信
           </button>

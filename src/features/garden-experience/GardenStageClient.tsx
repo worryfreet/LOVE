@@ -19,7 +19,7 @@ const GardenExperience = dynamic(
 )
 
 class GardenErrorBoundary extends Component<
-  { children: ReactNode },
+  { children: ReactNode; config: LoveExperienceConfig },
   { failed: boolean }
 > {
   state = { failed: false }
@@ -34,11 +34,19 @@ class GardenErrorBoundary extends Component<
 
   render() {
     if (this.state.failed) {
+      const { identity, letter, experience } = this.props.config.project
       return (
         <div className="garden-fallback" role="alert">
           <span>LOVE</span>
-          <h1>这座花园需要 WebGL 才能打开</h1>
-          <p>请使用最新版微信、Safari、Chrome 或 Edge，并关闭浏览器的省电模式后再试。</p>
+          <h1>{identity.recipientName || '亲爱的你'}，这份礼物仍然属于你</h1>
+          <p>{identity.senderName || '爱你的人'}为你准备的花园暂时无法在这台设备上呈现。</p>
+          <article>
+            <h2>{letter.title}</h2>
+            <p>{letter.salutation}</p>
+            <p>{letter.body}</p>
+            <strong>{letter.signature}</strong>
+          </article>
+          <p>{experience.endingMessage}</p>
           <button type="button" onClick={() => window.location.reload()}>重新打开</button>
         </div>
       )
@@ -51,14 +59,21 @@ export function GardenStageClient({
   config,
   mode,
   interiorEditor,
+  experienceKey,
 }: {
   config: LoveExperienceConfig
   mode: 'demo' | 'studio' | 'preview' | 'guest'
   interiorEditor?: GardenInteriorEditorRuntime
+  experienceKey?: string
 }) {
   return (
-    <GardenErrorBoundary>
-      <GardenExperience config={config} mode={mode} interiorEditor={interiorEditor} />
+    <GardenErrorBoundary config={config}>
+      <GardenExperience
+        config={config}
+        mode={mode}
+        interiorEditor={interiorEditor}
+        experienceKey={experienceKey}
+      />
     </GardenErrorBoundary>
   )
 }

@@ -43,6 +43,10 @@ import {
   type CottageGardenTuning,
 } from "../model/gardenTuning";
 import { cottagePortalRuntime } from "../model/cottagePortalMachine";
+import {
+  resolveCottageGardenRomanticTimePhase,
+  type CottageGardenRomanticSignal,
+} from "../model/gardenRomanticExperience";
 
 const skyVertexShader = /* glsl */ `
   varying vec3 vSkyDirection;
@@ -188,12 +192,14 @@ interface CottageGardenAtmosphereProps {
   timeCommand?: CottageGardenTimeCommand;
   tuning?: CottageGardenTuning;
   shadowsEnabled?: boolean;
+  romanticSignal?: CottageGardenRomanticSignal;
 }
 
 export function CottageGardenAtmosphere({
   timeCommand = COTTAGE_GARDEN_INITIAL_TIME_COMMAND,
   tuning = COTTAGE_GARDEN_TUNING_DEFAULTS,
   shadowsEnabled = true,
+  romanticSignal,
 }: CottageGardenAtmosphereProps) {
   const { camera, gl, scene } = useThree();
   const skyGroupRef = useRef<Group>(null);
@@ -305,14 +311,21 @@ export function CottageGardenAtmosphere({
 
   useFrame(() => {
     skyGroupRef.current?.position.copy(camera.position);
-    const transition = transitionRef.current;
-    const now = performance.now() / 1_000;
-    phaseRef.current = sampleCottageGardenTransitionPhase(
-      transition.startPhase,
-      transition.targetPhase,
-      now - transition.startedAt,
-      transition.durationSeconds,
-    );
+    const romanticFrame = romanticSignal?.getFrameSnapshot();
+    if (romanticFrame?.storyEnvironmentActive) {
+      phaseRef.current = resolveCottageGardenRomanticTimePhase(
+        romanticFrame.timeSeconds,
+      );
+    } else {
+      const transition = transitionRef.current;
+      const now = performance.now() / 1_000;
+      phaseRef.current = sampleCottageGardenTransitionPhase(
+        transition.startPhase,
+        transition.targetPhase,
+        now - transition.startedAt,
+        transition.durationSeconds,
+      );
+    }
     const sample = sampleCottageGardenTime(phaseRef.current);
     const interiorBlend = cottagePortalRuntime.getSnapshot().interiorBlend;
     sunDirection.set(...sample.sunDirection).normalize();
@@ -445,7 +458,9 @@ export function CottageGardenAtmosphere({
       to: sample.to,
       target: timeCommand.target,
       durationSeconds: timeCommand.durationSeconds,
-      transitioning: Math.abs(transition.targetPhase - phaseRef.current) > 1e-4,
+      transitioning: romanticFrame?.storyEnvironmentActive
+        ? phaseRef.current < 0.75 - 1e-4
+        : Math.abs(transitionRef.current.targetPhase - phaseRef.current) > 1e-4,
       order: "dawn-noon-dusk-evening-clockwise",
       weatherPreset: tuning.weather.preset,
       cloudCoverage: tuning.weather.cloudCoverage,

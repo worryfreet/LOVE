@@ -40,28 +40,38 @@ export interface CottageTableHydrangeaOccurrence {
   scale: number
 }
 
+export const COTTAGE_TABLE_HYDRANGEA_VASE = {
+  bodyHeight: 0.14,
+  bottomRadius: 0.052,
+  topRadius: 0.066,
+  lipY: 0.135,
+  lipRadius: 0.063,
+  lipTube: 0.008,
+  rootSafeRadius: 0.04,
+} as const
+
 /**
- * 圆桌花瓶中的三株模型库绣球花。小幅 X/Z 倾斜配合反向根点偏移，
- * 让茎根保持在瓶口内、花头向外自然散开。
+ * 圆桌花瓶中的三株模型库绣球花。一株正立主花配两株三分之二大小的斜向辅花，
+ * 辅花根点放在倾斜方向的反侧，使根茎先在瓶内交汇再穿过瓶口。
  */
 export const COTTAGE_TABLE_HYDRANGEA_OCCURRENCES = [
   {
     id: 'cottage.table.hydrangea.left',
-    position: [-0.0803, 0.1648, -0.0193],
-    rotation: [0.06, -0.46, 0.48],
-    scale: 0.128,
+    position: [-0.0313, 0.1242, -0.0214],
+    rotation: [0.03, -0.4, 0.58],
+    scale: 0.1,
   },
   {
     id: 'cottage.table.hydrangea.center',
-    position: [0.0044, 0.2214, -0.0148],
-    rotation: [-0.03, 0.32, -0.025],
-    scale: 0.16,
+    position: [-0.0002, 0.207, -0.0072],
+    rotation: [0, 0.18, 0],
+    scale: 0.15,
   },
   {
     id: 'cottage.table.hydrangea.right',
-    position: [0.0902, 0.1812, -0.0202],
-    rotation: [0.045, 0.4, -0.48],
-    scale: 0.143,
+    position: [0.0265, 0.1222, -0.0369],
+    rotation: [-0.03, 0.55, -0.58],
+    scale: 0.1,
   },
 ] as const satisfies readonly CottageTableHydrangeaOccurrence[]
 

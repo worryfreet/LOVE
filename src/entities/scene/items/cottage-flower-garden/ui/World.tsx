@@ -32,6 +32,7 @@ import {
   createCottageGardenTerrainHeightTexture,
 } from "./gardenFieldTextures";
 import type { CottageGardenGiftNames } from "../model/gardenEntrancePlaque";
+import type { CottageGardenRomanticSignal } from "../model/gardenRomanticExperience";
 
 export interface CottageFlowerGardenWorldProps extends SceneEnvironmentProps {
   children?: ReactNode;
@@ -41,6 +42,7 @@ export interface CottageFlowerGardenWorldProps extends SceneEnvironmentProps {
   interiorEditMode?: boolean;
   giftNames?: CottageGardenGiftNames;
   skyMessage?: string;
+  romanticSignal?: CottageGardenRomanticSignal;
 }
 
 export function CottageFlowerGardenWorld({
@@ -52,6 +54,7 @@ export function CottageFlowerGardenWorld({
   interiorEditMode = false,
   giftNames,
   skyMessage,
+  romanticSignal,
 }: CottageFlowerGardenWorldProps) {
   const portalSnapshot = useSyncExternalStore(
     cottagePortalRuntime.subscribe,
@@ -102,11 +105,13 @@ export function CottageFlowerGardenWorld({
         timeCommand={timeCommand}
         tuning={tuning}
         shadowsEnabled={!interiorEditMode}
+        romanticSignal={romanticSignal}
       />
       <CottageGardenRomanceSky
         command={skyAnimationCommand}
         reducedMotion={reducedMotion}
         message={skyMessage}
+        romanticSignal={romanticSignal}
       />
       <CottageGardenRenderer />
       <CottageGardenLodController tuning={tuning} />
@@ -135,6 +140,7 @@ export function CottageFlowerGardenWorld({
                 />
                 <CottageGardenPlanting
                   tuning={tuning}
+                  romanticSignal={romanticSignal}
                 />
               </>
             )}

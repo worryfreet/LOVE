@@ -17,6 +17,7 @@ export {
 export {
   COTTAGE_INTERIOR_KIT,
   COTTAGE_TABLE_HYDRANGEA_OCCURRENCES,
+  COTTAGE_TABLE_HYDRANGEA_VASE,
 } from './items/cottage-flower-garden/model/cottageInterior'
 export {
   COTTAGE_INTERIOR_DEFAULT_DOCUMENT,
@@ -89,6 +90,13 @@ export type {
   CottageGardenTimeCommand,
   CottageGardenTimeOfDay,
 } from './items/cottage-flower-garden/model/gardenTime'
+export {
+  resolveCottageGardenRomanticTimePhase,
+} from './items/cottage-flower-garden/model/gardenRomanticExperience'
+export type {
+  CottageGardenRomanticFrame,
+  CottageGardenRomanticSignal,
+} from './items/cottage-flower-garden/model/gardenRomanticExperience'
 export {
   COTTAGE_GARDEN_INITIAL_SKY_ANIMATION_COMMAND,
   COTTAGE_GARDEN_SKY_ANIMATION,

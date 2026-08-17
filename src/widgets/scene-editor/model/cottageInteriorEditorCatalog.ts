@@ -29,6 +29,7 @@ const FALLBACKS: readonly CottageInteriorEditorAssetFallback[] = [
   { id: 'cottage-round-table', name: '圆形木桌', category: '室内家具', accent: '#b97845', bounds: [1.14, 0.74, 1.14] },
   { id: 'cottage-wood-chair', name: '木椅', category: '室内家具', accent: '#ca9b63', bounds: [0.44, 0.86, 0.5] },
   { id: 'cottage-low-cabinet', name: '低柜与长椅', category: '室内家具', accent: '#a76d42', bounds: [2.15, 0.78, 0.46] },
+  { id: 'cottage-bookcase', name: '暖木书柜', category: '室内家具', accent: '#a46b42', bounds: [1.35, 1.95, 0.38] },
   { id: 'cottage-candle', name: '暖光蜡烛', category: '桌面摆件', accent: '#ffd38d', bounds: [0.08, 0.2, 0.08] },
   { id: 'cottage-envelope', name: '可拆情书', category: '桌面摆件', accent: '#efd3a5', bounds: [0.22, 0.12, 0.35] },
   { id: 'cottage-string-lights', name: '柔性长线彩灯', category: '室内照明', accent: '#ffbd66', bounds: [5.1, 0.3, 4.4] },

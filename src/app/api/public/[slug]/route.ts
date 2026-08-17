@@ -9,7 +9,12 @@ export async function GET(_request: Request, context: RouteContext<'/api/public/
   const project = await getPublishedProject(slug)
   if (!project) return NextResponse.json({ message: '花园不存在或已撤下' }, { status: 404 })
   return NextResponse.json(
-    { publicSlug: project.publicSlug, config: project.config, photos: project.photos },
+    {
+      publicSlug: project.publicSlug,
+      revisionId: project.revisionId,
+      config: project.config,
+      photos: project.photos,
+    },
     { headers: { 'Cache-Control': 'private, no-store' } },
   )
 }

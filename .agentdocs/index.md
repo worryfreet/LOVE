@@ -9,6 +9,8 @@
 
 ## 产品与架构文档
 
+`prd/shared-romantic-experience.md` - 分享链接“沉浸浪漫 / 自由享受”双模式、约一分钟叙事时间轴、路径前方玫瑰开放、情书暂停、流星结尾、状态机与验收方案；设计或实现访客分享体验时必读。
+
 `frontend/architecture.md` - LOVE 前端、场景运行时、创作者工作台、访客体验和验证约束；修改任何界面或场景代码时必读。
 
 `backend/architecture.md` - PostgreSQL、对象存储、无账号管理凭证、发布快照和媒体隐私边界；修改服务端逻辑时必读。
@@ -21,9 +23,15 @@
 
 `workflow/260816-extract-love-project.md` - 从 ModelStudio 抽离花海小院、实现无账号定制/发布/分享，并部署到 `love.atimefriend.cn` 的完整实施计划。
 
+`workflow/260817-smooth-interior-loading-deploy.md` - 修复首次开门加载完整室内时的白屏，以门缝暖光过渡遮挡准备期，并发布生产版本；处理进入小屋加载或本次部署时读取。
+
 ## 已完成任务文档
 
 `workflow/done/260817-refine-camera-interior.md` - 已完成开局右前方全景机位、前墙/右墙与桌面照片编排、三株绣球花自然摆放及生产发布；复核相同场景时读取。
+
+`workflow/done/260817-refine-cottage-furnishing.md` - 已完成信件内收、绣球花束重排、暖木书柜替换默认床铺及东墙照片避让；维护室内陈设时读取。
+
+`workflow/done/260817-immersive-romantic-share.md` - 已完成分享页沉浸浪漫与自由享受双模式、63 秒自动镜头、情书珍藏门禁、GPU 玫瑰开放波、流星终幕与原地控制交接；维护分享体验时读取。
 
 ## 全局重要记忆
 

@@ -191,9 +191,10 @@ export async function getPublishedProject(slug: string) {
   const result = await queryDatabase<{
     id: string
     public_slug: string
+    revision_id: string
     config: unknown
   }>(
-    `select p.id, p.public_slug, r.config
+    `select p.id, p.public_slug, r.id as revision_id, r.config
        from projects p
        join project_revisions r on r.id = p.published_revision_id
       where p.public_slug = $1 and p.status = 'published'`,
@@ -204,6 +205,7 @@ export async function getPublishedProject(slug: string) {
   return {
     id: row.id,
     publicSlug: row.public_slug,
+    revisionId: row.revision_id,
     config: normalizeLoveProjectConfig(row.config),
     photos: await loadPhotoAssets(row.id),
   }

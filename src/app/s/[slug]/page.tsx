@@ -29,12 +29,13 @@ export default async function SharedGardenPage({ params }: { params: Promise<{ s
   const { slug } = await params
   const project = await getPublishedProject(slug)
   if (!project) notFound()
-  const { identity } = project.config
   return (
     <main className="experience-page shared-page">
-      <GardenStageClient config={resolveLoveExperienceConfig(project.config, project.photos)} mode="guest" />
-      <header className="experience-brand"><strong>LOVE</strong><span>{identity.giftTitle}</span></header>
-      <p className="shared-dedication">TO {identity.recipientName || 'YOU'}<small>FROM {identity.senderName || 'SOMEONE WHO LOVES YOU'}</small></p>
+      <GardenStageClient
+        config={resolveLoveExperienceConfig(project.config, project.photos)}
+        mode="guest"
+        experienceKey={`${slug}:${project.revisionId}`}
+      />
     </main>
   )
 }

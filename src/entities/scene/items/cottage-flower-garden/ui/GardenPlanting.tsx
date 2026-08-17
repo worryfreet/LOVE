@@ -45,6 +45,12 @@ import {
 } from "../model/gardenFlowerLod";
 import type { CottageGardenTuning } from "../model/gardenTuning";
 import { sampleCottageFlowerGardenTerrainHeight } from "../model/gardenTerrain";
+import {
+  configureCottageGardenRoseBloomMaterial,
+  createCottageGardenRoseBloomUniforms,
+  type CottageGardenRoseBloomUniforms,
+} from "../model/gardenRoseBloom";
+import type { CottageGardenRomanticSignal } from "../model/gardenRomanticExperience";
 
 type RoseOrganSlot = "petal" | "leaf" | "structure";
 type GardenRoseMaterial =
@@ -85,12 +91,14 @@ function createGardenRoseMaterial({
   colorVariantId,
   sourceHeightMeters,
   windUniforms,
+  bloomUniforms,
 }: {
   quality: FlowerPopulationQuality;
   organSlot: RoseOrganSlot;
   colorVariantId?: RoseColorVariantId;
   sourceHeightMeters: number;
   windUniforms: FlowerWindUniforms;
+  bloomUniforms: CottageGardenRoseBloomUniforms;
 }) {
   const profile = FLOWER_RENDER_QUALITY_PROFILES[quality];
   const preset = colorVariantId
@@ -139,6 +147,13 @@ function createGardenRoseMaterial({
     wholePlantAmplitude: 0.026,
     petalAmplitude: organSlot === "petal" ? 0.008 : 0,
   });
+  if (organSlot === "petal") {
+    configureCottageGardenRoseBloomMaterial(
+      material,
+      bloomUniforms,
+      sourceHeightMeters,
+    );
+  }
   return material;
 }
 
@@ -150,6 +165,7 @@ function GardenRoseOrganBatch({
   capacity,
   colorVariantId,
   windUniforms,
+  bloomUniforms,
 }: {
   quality: FlowerPopulationQuality;
   organSlot: RoseOrganSlot;
@@ -158,6 +174,7 @@ function GardenRoseOrganBatch({
   capacity: number;
   colorVariantId?: RoseColorVariantId;
   windUniforms: FlowerWindUniforms;
+  bloomUniforms: CottageGardenRoseBloomUniforms;
 }) {
   const source =
     organSlot === "petal"
@@ -174,6 +191,7 @@ function GardenRoseOrganBatch({
         colorVariantId,
         sourceHeightMeters: prototype.sourceHeightMeters,
         windUniforms,
+        bloomUniforms,
       }),
     [
       colorVariantId,
@@ -181,6 +199,7 @@ function GardenRoseOrganBatch({
       prototype.sourceHeightMeters,
       quality,
       windUniforms,
+      bloomUniforms,
     ],
   );
 
@@ -247,12 +266,14 @@ function GardenRoseQualityBatch({
   occurrences,
   capacity,
   windUniforms,
+  bloomUniforms,
 }: {
   quality: FlowerPopulationQuality;
   prototype: ClassicRosePopulationPrototype;
   occurrences: readonly CottageGardenPlantOccurrence[];
   capacity: number;
   windUniforms: FlowerWindUniforms;
+  bloomUniforms: CottageGardenRoseBloomUniforms;
 }) {
   const petalsByColor = useMemo(
     () =>
@@ -273,6 +294,7 @@ function GardenRoseQualityBatch({
         occurrences={occurrences}
         capacity={capacity}
         windUniforms={windUniforms}
+        bloomUniforms={bloomUniforms}
       />
       <GardenRoseOrganBatch
         quality={quality}
@@ -281,6 +303,7 @@ function GardenRoseQualityBatch({
         occurrences={occurrences}
         capacity={capacity}
         windUniforms={windUniforms}
+        bloomUniforms={bloomUniforms}
       />
       {petalsByColor.map(({ colorVariantId, occurrences: colorOccurrences }) => (
         <GardenRoseOrganBatch
@@ -292,6 +315,7 @@ function GardenRoseQualityBatch({
           capacity={capacity}
           colorVariantId={colorVariantId}
           windUniforms={windUniforms}
+          bloomUniforms={bloomUniforms}
         />
       ))}
     </group>
@@ -385,8 +409,10 @@ function GardenSunflowerQualityBatch({
 
 export function CottageGardenPlanting({
   tuning,
+  romanticSignal,
 }: {
   tuning: CottageGardenTuning;
+  romanticSignal?: CottageGardenRomanticSignal;
 }) {
   const population = useMemo(
     () => createCottageGardenPlantPopulation(tuning.garden),
@@ -480,6 +506,11 @@ export function CottageGardenPlanting({
     });
   }
   const runtime = runtimeRef.current;
+  const bloomRuntimeRef = useRef<CottageGardenRoseBloomUniforms>(null);
+  if (!bloomRuntimeRef.current) {
+    bloomRuntimeRef.current = createCottageGardenRoseBloomUniforms();
+  }
+  const bloomRuntime = bloomRuntimeRef.current;
 
   useEffect(() => {
     updateFlowerWindUniforms(runtime, {
@@ -492,6 +523,9 @@ export function CottageGardenPlanting({
 
   useFrame(({ clock }) => {
     updateFlowerWindUniforms(runtime, { time: clock.elapsedTime });
+    const romanticFrame = romanticSignal?.getFrameSnapshot();
+    bloomRuntime.timeSeconds.value = romanticFrame?.timeSeconds ?? 0;
+    bloomRuntime.active.value = romanticFrame?.roseStoryActive ? 1 : 0;
     const wind = 0.018 * runtime.strength.value;
     sunflowerOccurrences.forEach((occurrence) => {
       const plant = sunflowerPlantsRef.current.get(occurrence.id);
@@ -574,6 +608,7 @@ export function CottageGardenPlanting({
             occurrences={occurrences}
             capacity={roseOccurrences.length}
             windUniforms={runtime}
+            bloomUniforms={bloomRuntime}
           />
         ) : null;
       })}

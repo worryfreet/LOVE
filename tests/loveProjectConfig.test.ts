@@ -21,6 +21,16 @@ test('无效配置只在读取旧数据时安全回退默认值', () => {
   assert.deepEqual(normalized, DEFAULT_LOVE_PROJECT_CONFIG)
 })
 
+test('旧发布快照缺少体验字段时会补齐沉浸默认值', () => {
+  const legacy = structuredClone(DEFAULT_LOVE_PROJECT_CONFIG) as Partial<
+    typeof DEFAULT_LOVE_PROJECT_CONFIG
+  >
+  delete legacy.experience
+  const normalized = normalizeLoveProjectConfig(legacy)
+  assert.equal(normalized.experience.immersiveEnabled, true)
+  assert.match(normalized.experience.endingMessage, /故事/u)
+})
+
 test('照片与情书只从统一项目配置派生到小屋实例', () => {
   const config = structuredClone(DEFAULT_LOVE_PROJECT_CONFIG)
   const assetId = 'f4b41d36-1c7a-4a61-9ad4-7df253df31c2'

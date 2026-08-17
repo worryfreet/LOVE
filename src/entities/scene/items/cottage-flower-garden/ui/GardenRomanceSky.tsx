@@ -31,6 +31,7 @@ import {
   disposeCottageGardenMeteorRender,
   updateCottageGardenMeteorRender,
 } from "./gardenMeteorShowerRender";
+import type { CottageGardenRomanticSignal } from "../model/gardenRomanticExperience";
 
 const starVertexShader = /* glsl */ `
   attribute vec3 color;
@@ -133,10 +134,12 @@ export function CottageGardenRomanceSky({
   command = COTTAGE_GARDEN_INITIAL_SKY_ANIMATION_COMMAND,
   reducedMotion = false,
   message = COTTAGE_GARDEN_SKY_ANIMATION.message,
+  romanticSignal,
 }: {
   command?: CottageGardenSkyAnimationCommand;
   reducedMotion?: boolean;
   message?: string;
+  romanticSignal?: CottageGardenRomanticSignal;
 }) {
   const { camera, gl, scene, size } = useThree();
   const skyGroupRef = useRef<Group>(null);
@@ -252,15 +255,23 @@ export function CottageGardenRomanceSky({
     if (skyGroup) {
       skyGroup.position.copy(camera.position);
     }
-    const resolvedTime = resolveCottageGardenSkyAnimationTime(
-      command,
-      performance.now(),
-    );
+    const romanticFrame = romanticSignal?.getFrameSnapshot();
+    const resolvedTime = romanticFrame?.storyEnvironmentActive
+      ? romanticFrame.skyTimeSeconds
+      : resolveCottageGardenSkyAnimationTime(command, performance.now());
     const visualTime = reducedMotion && resolvedTime > 0
       ? COTTAGE_GARDEN_SKY_ANIMATION.durationSeconds
       : resolvedTime;
     const sample = sampleCottageGardenSkyAnimation(visualTime);
-    if (lastAnchoredCommandNonceRef.current !== command.nonce) {
+    const anchorNonce = romanticFrame?.storyEnvironmentActive
+      ? romanticFrame.runId
+      : command.nonce;
+    const anchorReady =
+      !romanticFrame?.storyEnvironmentActive || resolvedTime > 0.03;
+    if (
+      anchorReady &&
+      lastAnchoredCommandNonceRef.current !== anchorNonce
+    ) {
       const previousTime = diagnosticsRef.current.timeSeconds;
       const shouldReanchor =
         previousTime <= 0.03 ||
@@ -274,7 +285,7 @@ export function CottageGardenRomanceSky({
         );
         eventAnchorPositionRef.current.copy(camera.position);
       }
-      lastAnchoredCommandNonceRef.current = command.nonce;
+      lastAnchoredCommandNonceRef.current = anchorNonce;
     }
     if (eventGroupRef.current) {
       eventGroupRef.current.position.copy(eventAnchorPositionRef.current);
@@ -329,7 +340,7 @@ export function CottageGardenRomanceSky({
       messageHorizontalScale,
       eventAnchorYaw: eventYawRef.current,
       eventAnchorPosition: eventAnchorPositionRef.current.toArray(),
-      commandNonce: command.nonce,
+      commandNonce: anchorNonce,
     });
   });
 

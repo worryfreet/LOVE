@@ -16,6 +16,7 @@ export const COTTAGE_INTERIOR_PART_IDS = [
   'cottage-round-table',
   'cottage-wood-chair',
   'cottage-low-cabinet',
+  'cottage-bookcase',
   'cottage-candle',
   'cottage-envelope',
   'cottage-string-lights',
@@ -102,6 +103,17 @@ function instance(
   }
 }
 
+function createDefaultBookcaseInstance() {
+  return instance(1, 'cottage-bookcase', [3.49, floorY, -1.8], -Math.PI / 2, {
+    width: 1.35,
+    depth: 0.38,
+    height: 1.95,
+    shelfCount: 4,
+    woodColor: '#87542F',
+    backColor: '#65402A',
+  })
+}
+
 /** 默认陈设使用局部米制坐标，入口位于 +Z，北侧照片墙位于 -Z。 */
 export function createDefaultCottageInteriorInstances() {
   const tableTop = floorY + 0.74
@@ -114,14 +126,7 @@ export function createDefaultCottageInteriorInstances() {
     COTTAGE_FLOWER_GARDEN_LAYOUT.cottage.centerX -
     0.027
   const defaults: CottageInteriorInstance[] = [
-    instance(1, 'cottage-single-bed', [2.45, floorY, -1.62], 0, {
-      width: 1.5,
-      length: 2,
-      bedHeight: 0.48,
-      beddingColor: '#F2DFD0',
-      throwColor: '#C8787B',
-      accentPillowColor: '#B86C6E',
-    }),
+    createDefaultBookcaseInstance(),
     instance(2, 'cottage-loveseat-sofa', [-2.25, floorY, 0.42], Math.PI / 2, {
       width: 1.84,
       depth: 0.82,
@@ -185,7 +190,7 @@ export function createDefaultCottageInteriorInstances() {
     instance(
       11,
       'cottage-envelope',
-      [-0.28, tableTop, 0.22],
+      [-0.12, tableTop, 0.18],
       -0.09,
       {
         width: 0.22,
@@ -241,8 +246,8 @@ export function createDefaultCottageInteriorInstances() {
       frameColor: '#A06B43',
       imageUrl: '',
     }),
-    // 东墙：三张相框共享视觉中心线，纵横画幅交替但不再上下散落。
-    instance(17, 'cottage-photo-frame', [eastPhotoX, 1.84, -1.65], -Math.PI / 2, {
+    // 东墙：三张相框整体前移，避开后侧书柜并保持等距节奏。
+    instance(17, 'cottage-photo-frame', [eastPhotoX, 1.84, -0.72], -Math.PI / 2, {
       mount: 'wall',
       width: 380,
       height: 520,
@@ -251,7 +256,7 @@ export function createDefaultCottageInteriorInstances() {
       frameColor: '#74462B',
       imageUrl: '',
     }),
-    instance(18, 'cottage-photo-frame', [eastPhotoX, 1.84, -0.8], -Math.PI / 2, {
+    instance(18, 'cottage-photo-frame', [eastPhotoX, 1.84, 0.12], -Math.PI / 2, {
       mount: 'wall',
       width: 500,
       height: 340,
@@ -260,7 +265,7 @@ export function createDefaultCottageInteriorInstances() {
       frameColor: '#9A6A45',
       imageUrl: '',
     }),
-    instance(19, 'cottage-photo-frame', [eastPhotoX, 1.84, 0.05], -Math.PI / 2, {
+    instance(19, 'cottage-photo-frame', [eastPhotoX, 1.84, 0.96], -Math.PI / 2, {
       mount: 'wall',
       width: 380,
       height: 520,
@@ -320,6 +325,32 @@ export const COTTAGE_INTERIOR_DEFAULT_DOCUMENT: CottageInteriorDocument = {
   schemaVersion: 2,
   sceneId: 'cottage-flower-garden',
   instances: createDefaultCottageInteriorInstances(),
+}
+
+function matchesLegacyDefaultBed(candidate: unknown) {
+  if (!candidate || typeof candidate !== 'object') return false
+  const source = candidate as Partial<CottageInteriorInstance>
+  return (
+    source.id === 'interior-instance-001' &&
+    source.partId === 'cottage-single-bed' &&
+    source.position?.x === 2.45 &&
+    source.position?.z === -1.62 &&
+    source.rotation?.y === 0 &&
+    source.scale?.x === 1 &&
+    source.scale?.y === 1 &&
+    source.scale?.z === 1 &&
+    Number(source.parameters?.width) === 1.5 &&
+    Number(source.parameters?.length) === 2 &&
+    Number(source.parameters?.bedHeight) === 0.48
+  )
+}
+
+/** 只替换旧版原封不动的默认床，用户自行摆放或改过参数的床继续保留。 */
+function migrateLegacyDefaultFurniture(value: unknown) {
+  if (!Array.isArray(value)) return value
+  return value.map((candidate) =>
+    matchesLegacyDefaultBed(candidate) ? createDefaultBookcaseInstance() : candidate,
+  )
 }
 
 function finite(value: unknown): value is number {
@@ -411,6 +442,15 @@ const PART_PARAMETER_RULES: Readonly<
     enums: {
       variant: ['cabinet', ['cabinet', 'cushioned-bench']],
     },
+  },
+  'cottage-bookcase': {
+    numbers: {
+      width: [0.9, 1.8, 1.35, 'meters-or-millimeters'],
+      depth: [0.28, 0.5, 0.38, 'meters-or-millimeters'],
+      height: [1.5, 2.15, 1.95, 'meters-or-millimeters'],
+      shelfCount: [3, 6, 4],
+    },
+    colors: { woodColor: '#87542F', backColor: '#65402A' },
   },
   'cottage-candle': {
     numbers: { diameter: [0.03, 0.12, 0.065], height: [0.08, 0.4, 0.16] },
@@ -686,7 +726,7 @@ export function parseCottageInteriorDocument(serialized: string | null) {
     }
     const sourceInstances =
       candidate.schemaVersion === 2
-        ? candidate.instances
+        ? migrateLegacyDefaultFurniture(candidate.instances)
         : candidate.schemaVersion === 1
           ? migrateLegacyCottageInteriorInstances(candidate.instances)
           : null
