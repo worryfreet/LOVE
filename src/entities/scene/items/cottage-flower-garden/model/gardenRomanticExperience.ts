@@ -16,7 +16,7 @@ export interface CottageGardenRomanticSignal {
 
 export function resolveCottageGardenRomanticTimePhase(timeSeconds: number) {
   const safeTime = Number.isFinite(timeSeconds) ? Math.max(0, timeSeconds) : 0
-  const nightProgress = Math.min(1, Math.max(0, (safeTime - 37) / 7))
+  const nightProgress = Math.min(1, Math.max(0, (safeTime - 45) / 7))
   const eased = nightProgress * nightProgress * (3 - 2 * nightProgress)
   return 0.5 + eased * 0.25
 }

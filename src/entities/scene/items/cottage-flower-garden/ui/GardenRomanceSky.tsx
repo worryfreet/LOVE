@@ -15,6 +15,7 @@ import {
   COTTAGE_GARDEN_INITIAL_SKY_ANIMATION_COMMAND,
   COTTAGE_GARDEN_METEORS,
   COTTAGE_GARDEN_SKY_ANIMATION,
+  COTTAGE_GARDEN_SKY_DOME_RADIUS_METERS,
   createCottageGardenBackgroundStars,
   createCottageGardenMessageStars,
   resolveCottageGardenEveningVisibility,
@@ -363,7 +364,7 @@ export function CottageGardenRomanceSky({
           frustumCulled={false}
           renderOrder={-9}
         >
-          <sphereGeometry args={[760, 32, 18]} />
+          <sphereGeometry args={[COTTAGE_GARDEN_SKY_DOME_RADIUS_METERS, 32, 18]} />
         </mesh>
         <points
           name="atmosphere.romance-sky.background-stars"

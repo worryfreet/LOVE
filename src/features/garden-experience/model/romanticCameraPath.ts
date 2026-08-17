@@ -13,6 +13,7 @@ export interface RomanticCameraPose {
 
 interface RomanticCameraKeyframe extends RomanticCameraPose {
   readonly timeSeconds: number
+  readonly interpolation?: 'linear' | 'smoothstep'
 }
 
 const { cottage, visitor } = COTTAGE_FLOWER_GARDEN_LAYOUT
@@ -43,25 +44,21 @@ const CAMERA_KEYFRAMES: readonly RomanticCameraKeyframe[] = [
     fov: 46,
   },
   {
-    timeSeconds: 16,
-    position: [0, 1.42, 16.2],
-    target: [-4.7, 1.22, 10.2],
-    fov: 50,
-  },
-  {
-    timeSeconds: 19.5,
-    position: [0, 1.42, 7.2],
-    target: [4.9, 1.24, 2.5],
-    fov: 52,
+    timeSeconds: 14.5,
+    position: [0, 1.42, 19.25],
+    target: [0, 1.5, cottage.centerZ + cottage.depth / 2],
+    fov: 48,
+    interpolation: 'linear',
   },
   {
     timeSeconds: ROMANTIC_STORY_TIMELINE.bloomWalkEnd,
     position: [0, 1.46, -7.8],
     target: [0, 1.5, cottage.centerZ + cottage.depth / 2],
     fov: 52,
+    interpolation: 'linear',
   },
   {
-    timeSeconds: 25.5,
+    timeSeconds: 33.5,
     position: [0, cottage.porchTop + visitor.eyeHeight, -9.82],
     target: [0, 1.48, cottage.centerZ + cottage.depth / 2 - 0.8],
     fov: 54,
@@ -73,13 +70,13 @@ const CAMERA_KEYFRAMES: readonly RomanticCameraKeyframe[] = [
     fov: 58,
   },
   {
-    timeSeconds: 29.5,
+    timeSeconds: 37.5,
     position: [-0.15, cottage.floorTop + 1.42, cottage.centerZ + 1.95],
     target: [-1.48, 1.74, cottage.centerZ - 3.04],
     fov: 54,
   },
   {
-    timeSeconds: 31.8,
+    timeSeconds: 39.8,
     position: [0, cottage.floorTop + 1.42, cottage.centerZ + 1.8],
     target: [0, 1.74, cottage.centerZ - 3.04],
     fov: 50,
@@ -97,39 +94,39 @@ const CAMERA_KEYFRAMES: readonly RomanticCameraKeyframe[] = [
     fov: COTTAGE_LOVE_LETTER_REVIEW_VIEW.fov,
   },
   {
-    timeSeconds: 39.5,
+    timeSeconds: 47.5,
     position: [0, cottage.floorTop + 1.42, cottage.centerZ + 2.4],
     target: [0, 1.5, cottage.centerZ + 5.2],
     fov: 54,
   },
   {
-    timeSeconds: 42,
+    timeSeconds: 50,
     position: [0, cottage.porchTop + visitor.eyeHeight, -8.9],
     target: [0, 1.48, 3.6],
     fov: 54,
   },
   {
-    timeSeconds: ROMANTIC_STORY_TIMELINE.returnGardenEnd,
+    timeSeconds: 52,
     position: [0, 1.42, 4.2],
     target: [0, 3.8, -22],
     fov: 54,
   },
   {
-    timeSeconds: 49,
+    timeSeconds: ROMANTIC_STORY_TIMELINE.returnGardenEnd,
     position: [0, 1.42, 4.2],
-    target: [0, 18, -65],
-    fov: 56,
+    target: [0, 70, -200],
+    fov: 58,
   },
   {
     timeSeconds: ROMANTIC_STORY_TIMELINE.skyAnimationEnd,
     position: [0, 1.42, 4.2],
-    target: [0, 42, -110],
+    target: [0, 70, -200],
     fov: 58,
   },
   {
     timeSeconds: ROMANTIC_STORY_TIMELINE.endingRevealEnd,
     position: [0, 1.42, 4.2],
-    target: [0, 42, -110],
+    target: [0, 70, -200],
     fov: 58,
   },
 ]
@@ -169,9 +166,11 @@ export function sampleRomanticCameraPose(timeSeconds: number): RomanticCameraPos
 
   const start = CAMERA_KEYFRAMES[nextIndex - 1]
   const end = CAMERA_KEYFRAMES[nextIndex]
-  const progress = smoothstep(
+  const rawProgress = clamp01(
     (safeTime - start.timeSeconds) / (end.timeSeconds - start.timeSeconds),
   )
+  const progress =
+    end.interpolation === 'linear' ? rawProgress : smoothstep(rawProgress)
   const position = mixPoint(start.position, end.position, progress)
   const target = mixPoint(start.target, end.target, progress)
   const groundHeight = COTTAGE_FLOWER_GARDEN_FIRST_PERSON.groundHeightAt?.({

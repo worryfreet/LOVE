@@ -13,6 +13,7 @@ import {
 import { ACESFilmicToneMapping, PCFSoftShadowMap, SRGBColorSpace } from 'three'
 import {
   COTTAGE_FLOWER_GARDEN_FIRST_PERSON,
+  COTTAGE_GARDEN_SKY_RENDER_FAR_METERS,
   cottagePortalRuntime,
   CottageFlowerGardenWorld,
   isCottageInteriorFurniturePositionClear,
@@ -308,7 +309,7 @@ export function GardenExperience({
           position: COTTAGE_FLOWER_GARDEN_FIRST_PERSON.spawn,
           fov: 52,
           near: 0.08,
-          far: 420,
+          far: COTTAGE_GARDEN_SKY_RENDER_FAR_METERS,
         }}
         dpr={quality === 'mobile' ? [0.75, 1] : [1, 1.25]}
         shadows

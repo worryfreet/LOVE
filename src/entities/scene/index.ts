@@ -100,6 +100,8 @@ export type {
 export {
   COTTAGE_GARDEN_INITIAL_SKY_ANIMATION_COMMAND,
   COTTAGE_GARDEN_SKY_ANIMATION,
+  COTTAGE_GARDEN_SKY_DOME_RADIUS_METERS,
+  COTTAGE_GARDEN_SKY_RENDER_FAR_METERS,
   resolveCottageGardenSkyAnimationTime,
 } from './items/cottage-flower-garden/model/gardenSkyAnimation'
 export type {

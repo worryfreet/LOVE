@@ -67,11 +67,14 @@ export const COTTAGE_GARDEN_SKY_ANIMATION = {
   messageAssemblyStartSeconds: 3.1,
   messageAssemblyEndSeconds: 7.4,
   messageDepthMeters: -420,
-  messageBaseHeightMeters: 58,
+  messageBaseHeightMeters: 160,
   backgroundStarCount: 4_200,
   messageStarsPerCell: 5,
   seed: 0x1a0e_2026,
 } as const;
+
+export const COTTAGE_GARDEN_SKY_DOME_RADIUS_METERS = 760;
+export const COTTAGE_GARDEN_SKY_RENDER_FAR_METERS = 900;
 
 export const COTTAGE_GARDEN_INITIAL_SKY_ANIMATION_COMMAND:
   CottageGardenSkyAnimationCommand = {

@@ -23,6 +23,8 @@
 
 `workflow/260816-extract-love-project.md` - 从 ModelStudio 抽离花海小院、实现无账号定制/发布/分享，并部署到 `love.atimefriend.cn` 的完整实施计划。
 
+`workflow/260817-slow-romantic-walk-sky-deploy.md` - 放慢沉浸模式院门至屋门直行镜头、将玫瑰开放阈值调整为 2 米，并修复繁星、流星及星空短句终幕后发布生产。
+
 ## 已完成任务文档
 
 `workflow/done/260817-refine-camera-interior.md` - 已完成开局右前方全景机位、前墙/右墙与桌面照片编排、三株绣球花自然摆放及生产发布；复核相同场景时读取。
