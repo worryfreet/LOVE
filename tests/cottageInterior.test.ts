@@ -462,16 +462,17 @@ describe('花海小院室内实例文档', () => {
     )
   })
 
-  it('旧版默认三蜡烛和分墙相框迁入单蜡烛八联照片墙', () => {
+  it('旧版默认三蜡烛和带位置槽的分墙相框迁入图三八联照片墙', () => {
     const defaults = createDefaultCottageInteriorInstances()
     const newCandle = defaults.find((item) => item.id === 'interior-instance-008')
     const newHero = defaults.find((item) => item.id === 'interior-instance-012')
     const newSidePhoto = defaults.find((item) => item.id === 'interior-instance-017')
     assert.ok(newCandle && newHero && newSidePhoto)
-    const heroParameters = { ...newHero.parameters }
+    const heroParameters = {
+      ...newHero.parameters,
+      imageUrl: 'data:image/png;base64,legacy-photo',
+    }
     const sideParameters = { ...newSidePhoto.parameters }
-    delete heroParameters.photoSlotId
-    delete sideParameters.photoSlotId
     const photoZ = newHero.position.z
     const eastPhotoX =
       COTTAGE_INTERIOR_NAVIGATION.maxX -
@@ -515,7 +516,13 @@ describe('花海小院室内实例文档', () => {
       migrated.find((item) => item.id === newCandle.id),
       newCandle,
     )
-    assert.deepEqual(migrated.find((item) => item.id === newHero.id), newHero)
+    assert.deepEqual(migrated.find((item) => item.id === newHero.id), {
+      ...newHero,
+      parameters: {
+        ...newHero.parameters,
+        imageUrl: 'data:image/png;base64,legacy-photo',
+      },
+    })
     assert.deepEqual(
       migrated.find((item) => item.id === newSidePhoto.id),
       newSidePhoto,

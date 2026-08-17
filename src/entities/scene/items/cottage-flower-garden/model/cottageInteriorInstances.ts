@@ -370,8 +370,7 @@ const matchesLegacyDefaultPhoto = (
     source.position?.z === position[2] &&
     source.rotation?.y === rotationY &&
     Number(source.parameters?.width) === size[0] &&
-    Number(source.parameters?.height) === size[1] &&
-    !source.parameters?.photoSlotId
+    Number(source.parameters?.height) === size[1]
   )
 }
 
@@ -447,7 +446,16 @@ export function migrateLegacyDefaultCottageInteriorInstances(value: unknown) {
         photo.size,
       )
     ) {
-      return [nextById.get(source.id as string) ?? candidate]
+      const replacement = nextById.get(source.id as string)
+      if (!replacement) return [candidate]
+      const imageUrl = source.parameters?.imageUrl
+      return [{
+        ...replacement,
+        parameters: {
+          ...replacement.parameters,
+          ...(typeof imageUrl === 'string' ? { imageUrl } : {}),
+        },
+      }]
     }
     const candle = typeof source.id === 'string' ? legacyCandles.get(source.id) : undefined
     if (

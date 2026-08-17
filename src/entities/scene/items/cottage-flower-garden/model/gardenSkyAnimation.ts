@@ -68,6 +68,9 @@ export const COTTAGE_GARDEN_SKY_ANIMATION = {
   messageAssemblyEndSeconds: 7.4,
   messageDepthMeters: -420,
   messageBaseHeightMeters: 260,
+  messageWidthMeters: 240,
+  messageCellSpacingMeters: 5.4,
+  messageRowSpacingMeters: 5.5,
   backgroundStarCount: 4_200,
   messageStarsPerCell: 5,
   seed: 0x1a0e_2026,
@@ -149,7 +152,7 @@ const MESSAGE_STREAM_ORIGINS = [
   [188, 22, -427],
 ] as const satisfies readonly CottageGardenSkyVector[];
 
-export const COTTAGE_GARDEN_METEORS = [
+const COTTAGE_GARDEN_BASE_METEORS = [
   {
     id: "meteor-01",
     startsAtSeconds: 0.1,
@@ -320,6 +323,32 @@ export const COTTAGE_GARDEN_METEORS = [
   },
 ] as const satisfies readonly CottageGardenMeteorDefinition[];
 
+export const COTTAGE_GARDEN_METEOR_COVERAGE_SCALE = {
+  horizontal: 1.7,
+  vertical: 1.6,
+  verticalCenter: 90,
+  trail: 1.65,
+} as const;
+
+/** 扩大整片天区的流星行程，同时保留既有节拍、亮度和消融变化。 */
+export const COTTAGE_GARDEN_METEORS: readonly CottageGardenMeteorDefinition[] =
+  COTTAGE_GARDEN_BASE_METEORS.map((meteor) => {
+    const expandPoint = (point: CottageGardenSkyVector): CottageGardenSkyVector => [
+      point[0] * COTTAGE_GARDEN_METEOR_COVERAGE_SCALE.horizontal,
+      COTTAGE_GARDEN_METEOR_COVERAGE_SCALE.verticalCenter +
+        (point[1] - COTTAGE_GARDEN_METEOR_COVERAGE_SCALE.verticalCenter) *
+          COTTAGE_GARDEN_METEOR_COVERAGE_SCALE.vertical,
+      point[2],
+    ];
+    return {
+      ...meteor,
+      start: expandPoint(meteor.start),
+      end: expandPoint(meteor.end),
+      trailLength:
+        meteor.trailLength * COTTAGE_GARDEN_METEOR_COVERAGE_SCALE.trail,
+    };
+  });
+
 const UINT32_RANGE = 4_294_967_296;
 
 function clamp01(value: number) {
@@ -440,7 +469,10 @@ export function createCottageGardenMessageStars(
 ) {
   const random = randomFactory(seed);
   const { cells, width } = messageCells(message.toUpperCase());
-  const cellSpacing = Math.min(2.7, 120 / Math.max(width, 1));
+  const cellSpacing = Math.min(
+    COTTAGE_GARDEN_SKY_ANIMATION.messageCellSpacingMeters,
+    COTTAGE_GARDEN_SKY_ANIMATION.messageWidthMeters / Math.max(width, 1),
+  );
   const centerColumn = (width - 1) / 2;
   const stars: CottageGardenMessageStar[] = [];
   cells.forEach((cell, cellIndex) => {
@@ -449,8 +481,8 @@ export function createCottageGardenMessageStars(
       sampleIndex < COTTAGE_GARDEN_SKY_ANIMATION.messageStarsPerCell;
       sampleIndex += 1
     ) {
-      const localX = (random() - 0.5) * 0.72;
-      const localY = (random() - 0.5) * 0.72;
+      const localX = (random() - 0.5) * 1.44;
+      const localY = (random() - 0.5) * 1.44;
       const paletteIndex = Math.floor(random() * MESSAGE_PALETTE.length);
       const streamIndex = Math.min(
         MESSAGE_STREAM_ORIGINS.length - 1,
@@ -467,7 +499,8 @@ export function createCottageGardenMessageStars(
       const target = [
         (cell.column - centerColumn) * cellSpacing + localX,
         COTTAGE_GARDEN_SKY_ANIMATION.messageBaseHeightMeters +
-          (6 - cell.row) * 2.75 +
+          (6 - cell.row) *
+            COTTAGE_GARDEN_SKY_ANIMATION.messageRowSpacingMeters +
           localY,
         COTTAGE_GARDEN_SKY_ANIMATION.messageDepthMeters +
           (random() - 0.5) * 2.8,
@@ -488,7 +521,7 @@ export function createCottageGardenMessageStars(
         ],
         streamPhase: random(),
         color: MESSAGE_PALETTE[paletteIndex],
-        size: 2.7 + random() * 2.8,
+        size: 4.8 + random() * 5,
         phase: random() * Math.PI * 2,
       });
     }

@@ -3,7 +3,10 @@ import { useRef } from 'react'
 import { PerspectiveCamera, Vector3 } from 'three'
 import { cottagePortalRuntime } from '@/entities/scene'
 import { sampleRomanticCameraPose } from '../model/romanticCameraPath'
-import type { RomanticStoryRuntime } from '../model/romanticStory'
+import {
+  ROMANTIC_STORY_TIMELINE,
+  type RomanticStoryRuntime,
+} from '../model/romanticStory'
 
 export function RomanticCameraDirector({
   runtime,
@@ -21,7 +24,10 @@ export function RomanticCameraDirector({
       lastRunId.current = frame.runId
       cottagePortalRuntime.reset()
     }
-    if (frame.automaticCamera && frame.timeSeconds >= 21.5) {
+    if (
+      frame.automaticCamera &&
+      frame.timeSeconds >= ROMANTIC_STORY_TIMELINE.bloomWalkEnd - 9.5
+    ) {
       cottagePortalRuntime.requestOpen()
     }
     if (!frame.automaticCamera) return

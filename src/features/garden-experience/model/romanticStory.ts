@@ -1,15 +1,15 @@
 export const ROMANTIC_STORY_TIMELINE = {
   revealEnd: 3,
   approachEnd: 9,
-  plaqueEnd: 13,
-  bloomWalkEnd: 31,
-  interiorEntryEnd: 35,
-  galleryEnd: 42,
-  letterArrival: 45,
-  returnGardenEnd: 54,
-  skyAnimationEnd: 64,
-  skyMessageHoldEnd: 69,
-  endingRevealEnd: 73,
+  plaqueEnd: 14,
+  bloomWalkEnd: 39,
+  interiorEntryEnd: 44,
+  galleryEnd: 51,
+  letterArrival: 54,
+  returnGardenEnd: 68,
+  skyAnimationEnd: 78,
+  skyMessageHoldEnd: 83,
+  endingRevealEnd: 87,
 } as const
 
 export type RomanticStoryPhase =

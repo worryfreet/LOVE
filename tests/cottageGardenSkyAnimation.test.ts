@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   COTTAGE_GARDEN_METEORS,
+  COTTAGE_GARDEN_METEOR_COVERAGE_SCALE,
   COTTAGE_GARDEN_SKY_ANIMATION,
   COTTAGE_GARDEN_SKY_DOME_RADIUS_METERS,
   COTTAGE_GARDEN_SKY_RENDER_FAR_METERS,
@@ -80,13 +81,21 @@ describe("花海小院十秒告白天空", () => {
     first.forEach((star) => {
       assert.ok(
         star.target[1] >=
-          COTTAGE_GARDEN_SKY_ANIMATION.messageBaseHeightMeters - 0.37,
+          COTTAGE_GARDEN_SKY_ANIMATION.messageBaseHeightMeters - 0.73,
       );
       assert.deepEqual(
         resolveCottageGardenMessageStarPosition(star, 10),
         star.target,
       );
     });
+    const targetWidth =
+      Math.max(...first.map((star) => star.target[0])) -
+      Math.min(...first.map((star) => star.target[0]));
+    const targetHeight =
+      Math.max(...first.map((star) => star.target[1])) -
+      Math.min(...first.map((star) => star.target[1]));
+    assert.ok(targetWidth > 210);
+    assert.ok(targetHeight > 30);
   });
 
   it("全天穹繁星与十二颗单向长尾细流星按固定种子、固定节拍生成", () => {
@@ -110,6 +119,17 @@ describe("花海小院十秒告白天空", () => {
     assert.equal(azimuthSectors.size, 8);
     assert.equal(elevationBands.size, 3);
     assert.equal(COTTAGE_GARDEN_METEORS.length, 12);
+    assert.deepEqual(COTTAGE_GARDEN_METEOR_COVERAGE_SCALE, {
+      horizontal: 1.7,
+      vertical: 1.6,
+      verticalCenter: 90,
+      trail: 1.65,
+    });
+    const meteorX = COTTAGE_GARDEN_METEORS.flatMap((meteor) => [
+      meteor.start[0],
+      meteor.end[0],
+    ]);
+    assert.ok(Math.max(...meteorX) - Math.min(...meteorX) > 650);
 
     COTTAGE_GARDEN_METEORS.forEach((meteor) => {
       const deltaX = meteor.end[0] - meteor.start[0];
@@ -152,9 +172,9 @@ describe("花海小院十秒告白天空", () => {
       assert.equal(expired.opacity, 0);
       assert.ok(deltaX > 0);
       assert.ok(deltaY < 0);
-      assert.ok(downwardSlope >= 0.38 && downwardSlope <= 0.55);
-      assert.ok(journeyLength >= 155);
-      assert.ok(meteor.trailLength >= 90);
+      assert.ok(downwardSlope >= 0.35 && downwardSlope <= 0.53);
+      assert.ok(journeyLength >= 250);
+      assert.ok(meteor.trailLength >= 145);
       assert.ok(meteor.headSize <= 2.75);
       assert.ok(meteor.brightness >= 0.2 && meteor.brightness <= 1);
       assert.ok(meteor.fragmentCount >= 0 && meteor.fragmentCount <= 4);

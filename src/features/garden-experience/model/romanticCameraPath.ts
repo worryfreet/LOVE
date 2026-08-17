@@ -38,13 +38,13 @@ const CAMERA_KEYFRAMES: readonly RomanticCameraKeyframe[] = [
     fov: 48,
   },
   {
-    timeSeconds: 13,
+    timeSeconds: ROMANTIC_STORY_TIMELINE.plaqueEnd,
     position: [0, 1.42, 20.25],
     target: [0, 2.02, 19.05],
     fov: 46,
   },
   {
-    timeSeconds: 14.5,
+    timeSeconds: 17,
     position: [0, 1.42, 19.25],
     target: [0, 1.5, cottage.centerZ + cottage.depth / 2],
     fov: 48,
@@ -58,7 +58,7 @@ const CAMERA_KEYFRAMES: readonly RomanticCameraKeyframe[] = [
     interpolation: 'linear',
   },
   {
-    timeSeconds: 33.5,
+    timeSeconds: 42.5,
     position: [0, cottage.porchTop + visitor.eyeHeight, -9.82],
     target: [0, 1.48, cottage.centerZ + cottage.depth / 2 - 0.8],
     fov: 54,
@@ -70,13 +70,13 @@ const CAMERA_KEYFRAMES: readonly RomanticCameraKeyframe[] = [
     fov: 58,
   },
   {
-    timeSeconds: 37.5,
+    timeSeconds: 46.5,
     position: [-0.15, cottage.floorTop + 1.42, cottage.centerZ + 1.95],
     target: [-1.48, 1.74, cottage.centerZ - 3.04],
     fov: 54,
   },
   {
-    timeSeconds: 39.8,
+    timeSeconds: 48.8,
     position: [0, cottage.floorTop + 1.42, cottage.centerZ + 1.8],
     target: [0, 1.74, cottage.centerZ - 3.04],
     fov: 50,
@@ -84,7 +84,7 @@ const CAMERA_KEYFRAMES: readonly RomanticCameraKeyframe[] = [
   {
     timeSeconds: ROMANTIC_STORY_TIMELINE.galleryEnd,
     position: [0.18, cottage.floorTop + 1.42, cottage.centerZ + 1.72],
-    target: [cottage.width / 2 - 0.3, 1.84, cottage.centerZ - 0.8],
+    target: [cottage.width / 2 - 0.72, 1.84, cottage.centerZ - 3.04],
     fov: 54,
   },
   {
@@ -94,19 +94,19 @@ const CAMERA_KEYFRAMES: readonly RomanticCameraKeyframe[] = [
     fov: COTTAGE_LOVE_LETTER_REVIEW_VIEW.fov,
   },
   {
-    timeSeconds: 47.5,
+    timeSeconds: 59,
     position: [0, cottage.floorTop + 1.42, cottage.centerZ + 2.4],
     target: [0, 1.5, cottage.centerZ + 5.2],
     fov: 54,
   },
   {
-    timeSeconds: 50,
+    timeSeconds: 64,
     position: [0, cottage.porchTop + visitor.eyeHeight, -8.9],
     target: [0, 1.48, 3.6],
     fov: 54,
   },
   {
-    timeSeconds: 52,
+    timeSeconds: 66,
     position: [0, 1.42, 4.2],
     target: [0, 3.8, -22],
     fov: 54,
