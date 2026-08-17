@@ -17,6 +17,8 @@ Internet -> love.atimefriend.cn:443 -> Nginx -> 127.0.0.1:3100
 ## 发布输入
 
 - 远程仓库：`git@github.com:worryfreet/LOVE.git`。
+- 唯一长期分支为 `master`；所有新功能直接在本地 `master` 修改并通过门禁，随后推送 `origin/master`，服务器只从 `origin/master` 拉取发布，不再创建功能分支或发布分支。
+- 每次发布必须同时核对本地 `master`、`origin/master` 与服务器 release `HEAD` 三个 SHA 完全一致；任何一端落后都不得切流。
 - 发布分支必须先通过 `npm run check`；服务器拉取后再次核对 `git rev-parse HEAD` 与批准 SHA 完全一致。
 - 服务器秘密文件至少包含 `POSTGRES_PASSWORD`、`MINIO_ROOT_PASSWORD`、`SESSION_SECRET` 和可选 `LOVE_IMAGE_TAG`。
 - 不使用 `.env.example` 作为生产秘密；不在 Workbench 输出中打印秘密文件。
@@ -25,7 +27,7 @@ Internet -> love.atimefriend.cn:443 -> Nginx -> 127.0.0.1:3100
 
 1. 使用 Workbench 对唯一 ECS 做只读审计：系统资源、Docker/Compose、Git、Nginx、证书、端口、磁盘和服务器 SSH Key 的 GitHub 只读权限。
 2. 确认 DNS、公网入口、备案与证书条件。任何目标目录上传前先检查是否存在。
-3. 创建全新的 release 目录，使用服务器 SSH Key 拉取批准提交；设置只读代码权限。
+3. 创建全新的 release 目录，使用服务器 SSH Key 拉取 `origin/master` 最新提交并核对批准 SHA；设置只读代码权限。
 4. 链接秘密文件到 release，运行 `docker compose ... config --quiet`，构建 `love:<git-sha>` 镜像。
 5. 先启动 database、storage 和 storage-init；执行校验和迁移，确认迁移退出码为 0。
 6. 在切流前执行 `deploy/backup.sh /srv/love/shared/backups` 并验证备份非空。
