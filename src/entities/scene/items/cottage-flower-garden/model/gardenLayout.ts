@@ -50,7 +50,9 @@ export const COTTAGE_FLOWER_GARDEN_LAYOUT = {
   visitor: {
     eyeHeight: 1.42,
     radius: 0.28,
-    spawn: [0, 1.42, 17.4] as [number, number, number],
+    // 入口位于 +Z；截图所示右前方视野在世界西南投影侧，因此从 -X/+Z 外围斜看整座庭院。
+    spawn: [-18, 1.42, 25] as [number, number, number],
+    initialTarget: [0, 1.08, -5.2] as [number, number, number],
   },
 } as const;
 

@@ -5,6 +5,7 @@ export interface FirstPersonActionContext {
 
 export interface FirstPersonConfig {
   spawn: [number, number, number]
+  initialTarget?: readonly [number, number, number]
   eyeHeight?: number
   bounds: {
     minX: number

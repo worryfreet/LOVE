@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile, stat } from 'node:fs/promises'
 import { describe, it } from 'node:test'
+import { Euler, Vector3 } from 'three'
 import {
   COTTAGE_INTERIOR_KIT,
   COTTAGE_INTERIOR_RUNTIME_VISIBILITY,
@@ -148,8 +149,28 @@ describe('花海小院室内建筑骨架', () => {
     COTTAGE_TABLE_HYDRANGEA_OCCURRENCES.forEach((occurrence) => {
       assert.ok(occurrence.scale >= 0.12 && occurrence.scale <= 0.18)
       assert.ok(occurrence.position.every(Number.isFinite))
-      assert.ok(Number.isFinite(occurrence.rotationY))
+      assert.ok(occurrence.rotation.every(Number.isFinite))
+      const stemRoot = new Vector3(0, -1.26, 0.0078)
+        .multiplyScalar(occurrence.scale)
+        .applyEuler(new Euler(...occurrence.rotation))
+        .add(new Vector3(...occurrence.position))
+      assert.ok(Math.hypot(stemRoot.x, stemRoot.z) < 0.018)
+      assert.ok(stemRoot.y > 0 && stemRoot.y < 0.04)
     })
+    assert.equal(
+      new Set(COTTAGE_TABLE_HYDRANGEA_OCCURRENCES.map(({ scale }) => scale)).size,
+      3,
+    )
+    const bloomCenters = COTTAGE_TABLE_HYDRANGEA_OCCURRENCES
+      .map((occurrence) =>
+        new Vector3(0, 0.55, 0.02)
+          .multiplyScalar(occurrence.scale)
+          .applyEuler(new Euler(...occurrence.rotation))
+          .add(new Vector3(...occurrence.position)),
+      )
+      .sort((left, right) => left.x - right.x)
+    assert.ok(bloomCenters[1].x - bloomCenters[0].x > 0.08)
+    assert.ok(bloomCenters[2].x - bloomCenters[1].x > 0.08)
     assert.match(interiorRuntimeSource, /HydrangeaAssembly/)
     assert.match(interiorRuntimeSource, /HYDRANGEA_CUSTOM_CONFIGURATION/)
     assert.match(interiorRuntimeSource, /COTTAGE_TABLE_HYDRANGEA_OCCURRENCES\.map/)
@@ -188,7 +209,7 @@ describe('花海小院室内建筑骨架', () => {
 })
 
 describe('花海小院室内实例文档', () => {
-  it('冻结十类目录零件与 v6 九张照片礼物叙事陈设', () => {
+  it('冻结十类目录零件与九张照片的有序礼物叙事陈设', () => {
     assert.equal(COTTAGE_INTERIOR_PART_IDS.length, 10)
     const defaults = createDefaultCottageInteriorInstances()
     assert.deepEqual(defaults, COTTAGE_INTERIOR_DEFAULT_DOCUMENT.instances)
@@ -228,16 +249,23 @@ describe('花海小院室内实例文档', () => {
         : largest,
     )
     assert.equal(northHero.position.x, 0)
-    assert.equal(northHero.parameters.width, 900)
-    assert.equal(northHero.parameters.height, 700)
-    assert.ok(
-      new Set(
-        northWallPhotos
-          .filter((photo) => photo.id !== northHero.id)
-          .map((photo) =>
-            `${String(photo.parameters.width)}×${String(photo.parameters.height)}`,
-          ),
-      ).size >= 4,
+    assert.equal(northHero.parameters.width, 1180)
+    assert.equal(northHero.parameters.height, 740)
+    assert.equal(northHero.parameters.frameRailWidth, 18)
+    assert.equal(northHero.parameters.matWidth, 4)
+    assert.ok(northWallPhotos.every((photo) => photo.position.y === 1.74))
+    assert.deepEqual(
+      northWallPhotos.map((photo) => photo.position.x).sort((a, b) => a - b),
+      [-1.55, -0.92, 0, 0.92, 1.55],
+    )
+    assert.deepEqual(
+      northWallPhotos
+        .filter((photo) => photo.id !== northHero.id)
+        .map((photo) =>
+          `${String(photo.parameters.width)}×${String(photo.parameters.height)}`,
+        )
+        .sort(),
+      ['340×480', '340×480', '430×300', '430×300'],
     )
     assert.ok(
       eastWallPhotos.every(
@@ -249,6 +277,11 @@ describe('花海小院室内实例文档', () => {
                 0.027),
           ) < 0.000_001,
       ),
+    )
+    assert.ok(eastWallPhotos.every((photo) => photo.position.y === 1.84))
+    assert.deepEqual(
+      eastWallPhotos.map((photo) => photo.position.z).sort((a, b) => a - b),
+      [-1.65, -0.8, 0.05],
     )
     assert.ok(
       defaults.some(
@@ -262,6 +295,10 @@ describe('花海小院室内实例文档', () => {
     assert.ok(table)
     assert.equal(tablePhoto.supportId, table.id)
     assert.equal(tablePhoto.position.y, getCottageRoundTableTopY(table))
+    assert.deepEqual(
+      [tablePhoto.position.x, tablePhoto.position.z, tablePhoto.rotation.y],
+      [-0.31, -0.29, 0.12],
+    )
     assert.ok(
       defaults
         .filter(
@@ -366,7 +403,7 @@ describe('花海小院室内实例文档', () => {
         matWidth: 999_999,
         mount: 'ceiling',
       }),
-      { width: 900, height: 240, matWidth: 40, mount: 'wall' },
+      { width: 1200, height: 240, matWidth: 40, mount: 'wall' },
     )
     const lights = COTTAGE_INTERIOR_DEFAULT_DOCUMENT.instances.find(
       (instance) => instance.partId === 'cottage-string-lights',

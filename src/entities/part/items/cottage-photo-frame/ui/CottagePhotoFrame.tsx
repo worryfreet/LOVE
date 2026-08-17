@@ -39,6 +39,8 @@ export interface CottagePhotoFrameDirectProps {
   readonly imageUrl?: string
   /** 卡纸边宽，单位：米。 */
   readonly matWidth: number
+  /** 木框边宽，单位：米；不传时由整体尺寸自动计算。 */
+  readonly frameRailWidth?: number
   readonly quality?: 'desktop' | 'mobile'
   readonly onTextureStatusChange?: (
     status: CottagePhotoFrameTextureStatus,
@@ -425,6 +427,11 @@ function readMillimeters(
   return Number.isFinite(parsed) ? parsed / 1000 : fallback / 1000
 }
 
+function readOptionalMillimeters(value: PartParameterValues[string] | undefined) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed / 1000 : undefined
+}
+
 function resolvePhotoFrameProps(
   props: CottagePhotoFrameProps,
 ): CottagePhotoFrameDirectProps {
@@ -444,6 +451,7 @@ function resolvePhotoFrameProps(
         ? parameters.imageUrl
         : undefined,
     matWidth: readMillimeters(parameters.matWidth, 32),
+    frameRailWidth: readOptionalMillimeters(parameters.frameRailWidth),
     quality: props.quality,
     onTextureStatusChange: props.onTextureStatusChange,
   }
@@ -469,12 +477,19 @@ export function CottagePhotoFrame(props: CottagePhotoFrameProps) {
     frameColor,
     imageUrl,
     matWidth,
+    frameRailWidth,
     quality = 'desktop',
     onTextureStatusChange,
   } = resolvePhotoFrameProps(props)
   const spec = useMemo(
-    () => resolveCottagePhotoFrameSpec({ mount, width, height, matWidth }),
-    [height, matWidth, mount, width],
+    () => resolveCottagePhotoFrameSpec({
+      mount,
+      width,
+      height,
+      matWidth,
+      frameRailWidth,
+    }),
+    [frameRailWidth, height, matWidth, mount, width],
   )
   const texture = useManagedPhotoTexture(imageUrl, onTextureStatusChange)
   const materials = useMemo(

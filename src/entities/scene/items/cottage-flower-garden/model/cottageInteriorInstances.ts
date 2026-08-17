@@ -102,7 +102,7 @@ function instance(
   }
 }
 
-/** v6 默认陈设使用局部米制坐标，入口位于 +Z，北侧照片墙位于 -Z。 */
+/** 默认陈设使用局部米制坐标，入口位于 +Z，北侧照片墙位于 -Z。 */
 export function createDefaultCottageInteriorInstances() {
   const tableTop = floorY + 0.74
   const photoZ =
@@ -195,83 +195,92 @@ export function createDefaultCottageInteriorInstances() {
       },
       { supportId: 'interior-instance-004' },
     ),
-    // 北墙：一张横向主照片建立焦点，四张小照片以不等高留白围合。
-    instance(12, 'cottage-photo-frame', [0, 1.67, photoZ], 0, {
+    // 北墙：同一中心线上的五联照片墙，以中央主照片和两侧对称节奏建立秩序。
+    instance(12, 'cottage-photo-frame', [0, 1.74, photoZ], 0, {
       mount: 'wall',
-      width: 900,
-      height: 700,
-      matWidth: 38,
+      width: 1180,
+      height: 740,
+      frameRailWidth: 18,
+      matWidth: 4,
       frameColor: '#74462B',
       imageUrl: '',
     }),
-    instance(13, 'cottage-photo-frame', [-1.14, 2.08, photoZ], 0, {
+    instance(13, 'cottage-photo-frame', [-1.55, 1.74, photoZ], 0, {
       mount: 'wall',
-      width: 440,
-      height: 320,
-      matWidth: 24,
+      width: 430,
+      height: 300,
+      frameRailWidth: 18,
+      matWidth: 8,
       frameColor: '#956640',
       imageUrl: '',
     }),
-    instance(14, 'cottage-photo-frame', [-1.18, 1.58, photoZ], 0, {
+    instance(14, 'cottage-photo-frame', [-0.92, 1.74, photoZ], 0, {
       mount: 'wall',
       width: 340,
-      height: 460,
-      matWidth: 22,
+      height: 480,
+      frameRailWidth: 18,
+      matWidth: 8,
       frameColor: '#6E4328',
       imageUrl: '',
     }),
-    instance(15, 'cottage-photo-frame', [1.12, 2.06, photoZ], 0, {
+    instance(15, 'cottage-photo-frame', [0.92, 1.74, photoZ], 0, {
       mount: 'wall',
-      width: 330,
-      height: 420,
-      matWidth: 22,
+      width: 340,
+      height: 480,
+      frameRailWidth: 18,
+      matWidth: 8,
       frameColor: '#8A5835',
       imageUrl: '',
     }),
-    instance(16, 'cottage-photo-frame', [1.16, 1.38, photoZ], 0, {
+    instance(16, 'cottage-photo-frame', [1.55, 1.74, photoZ], 0, {
       mount: 'wall',
-      width: 480,
-      height: 340,
-      matWidth: 24,
+      width: 430,
+      height: 300,
+      frameRailWidth: 18,
+      matWidth: 8,
       frameColor: '#A06B43',
       imageUrl: '',
     }),
-    // 东墙：三张错落相框朝 -X，填补床上方与前段空墙。
-    instance(17, 'cottage-photo-frame', [eastPhotoX, 1.82, -1.55], -Math.PI / 2, {
+    // 东墙：三张相框共享视觉中心线，纵横画幅交替但不再上下散落。
+    instance(17, 'cottage-photo-frame', [eastPhotoX, 1.84, -1.65], -Math.PI / 2, {
       mount: 'wall',
-      width: 520,
-      height: 640,
-      matWidth: 30,
+      width: 380,
+      height: 520,
+      frameRailWidth: 18,
+      matWidth: 8,
       frameColor: '#74462B',
       imageUrl: '',
     }),
-    instance(18, 'cottage-photo-frame', [eastPhotoX, 1.34, -0.47], -Math.PI / 2, {
+    instance(18, 'cottage-photo-frame', [eastPhotoX, 1.84, -0.8], -Math.PI / 2, {
       mount: 'wall',
-      width: 420,
-      height: 300,
-      matWidth: 22,
+      width: 500,
+      height: 340,
+      frameRailWidth: 18,
+      matWidth: 8,
       frameColor: '#9A6A45',
       imageUrl: '',
     }),
-    instance(19, 'cottage-photo-frame', [eastPhotoX, 1.92, 0.46], -Math.PI / 2, {
+    instance(19, 'cottage-photo-frame', [eastPhotoX, 1.84, 0.05], -Math.PI / 2, {
       mount: 'wall',
-      width: 350,
-      height: 460,
-      matWidth: 22,
+      width: 380,
+      height: 520,
+      frameRailWidth: 18,
+      matWidth: 8,
       frameColor: '#805033',
       imageUrl: '',
     }),
-    // 桌面相框由圆桌承载，使用支架变体并朝入口方向展示。
+    // 桌面相框收在左后侧并略朝房间中心偏转，与右侧花瓶形成平衡。
     instance(
       20,
       'cottage-photo-frame',
-      [-0.32, tableTop, -0.44],
-      0,
+      [-0.31, tableTop, -0.29],
+      0.12,
       {
         mount: 'table',
-        width: 240,
-        height: 300,
-        matWidth: 18,
+        width: 210,
+        height: 270,
+        frameRailWidth: 16,
+        matWidth: 6,
         frameColor: '#8A5835',
         imageUrl: '',
       },
@@ -360,8 +369,8 @@ const PART_PARAMETER_RULES: Readonly<
   },
   'cottage-photo-frame': {
     numbers: {
-      width: [240, 900, 520], height: [240, 800, 400],
-      matWidth: [12, 40, 32],
+      width: [240, 1200, 520], height: [240, 900, 400],
+      frameRailWidth: [12, 50, 24], matWidth: [0, 40, 16],
     },
     colors: { frameColor: '#8A5835' },
     enums: { mount: ['wall', ['wall', 'table']] },

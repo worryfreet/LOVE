@@ -8,3 +8,13 @@
 - 每次功能变更必须运行 `npm run lint`、`npm run typecheck`、`npm test` 与 `npm run build`。
 - 涉及数据库时使用独立 `TEST_DATABASE_URL` 运行集成测试，禁止把生产数据库用于测试。
 - 涉及页面交互时补充并运行 Playwright E2E；桌面和移动视口都必须验收。
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

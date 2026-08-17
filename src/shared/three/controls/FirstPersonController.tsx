@@ -53,11 +53,12 @@ export function FirstPersonController({
         config.spawn[2],
       ]
     const initialTarget: readonly [number, number, number] =
-      initialView?.target ?? [
-        config.spawn[0],
-        config.spawn[1] - 0.04,
-        config.spawn[2] - 1,
-      ]
+      initialView?.target ??
+      config.initialTarget ?? [
+          config.spawn[0],
+          config.spawn[1] - 0.04,
+          config.spawn[2] - 1,
+        ]
     camera.position.set(...initialPosition)
     camera.lookAt(...initialTarget)
     direction.current

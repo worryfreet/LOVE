@@ -36,29 +36,32 @@ export interface CottageInteriorKit {
 export interface CottageTableHydrangeaOccurrence {
   id: string
   position: readonly [number, number, number]
-  rotationY: number
+  rotation: readonly [number, number, number]
   scale: number
 }
 
-/** 圆桌花瓶中的三株模型库绣球花，仅保存确定性的场景变换。 */
+/**
+ * 圆桌花瓶中的三株模型库绣球花。小幅 X/Z 倾斜配合反向根点偏移，
+ * 让茎根保持在瓶口内、花头向外自然散开。
+ */
 export const COTTAGE_TABLE_HYDRANGEA_OCCURRENCES = [
   {
     id: 'cottage.table.hydrangea.left',
-    position: [-0.072, 0.205, 0.012],
-    rotationY: -0.38,
-    scale: 0.145,
+    position: [-0.0803, 0.1648, -0.0193],
+    rotation: [0.06, -0.46, 0.48],
+    scale: 0.128,
   },
   {
     id: 'cottage.table.hydrangea.center',
-    position: [0.018, 0.225, -0.038],
-    rotationY: 0.62,
-    scale: 0.15,
+    position: [0.0044, 0.2214, -0.0148],
+    rotation: [-0.03, 0.32, -0.025],
+    scale: 0.16,
   },
   {
     id: 'cottage.table.hydrangea.right',
-    position: [0.078, 0.198, 0.052],
-    rotationY: 1.44,
-    scale: 0.14,
+    position: [0.0902, 0.1812, -0.0202],
+    rotation: [0.045, 0.4, -0.48],
+    scale: 0.143,
   },
 ] as const satisfies readonly CottageTableHydrangeaOccurrence[]
 

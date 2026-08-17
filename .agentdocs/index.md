@@ -21,6 +21,8 @@
 
 `workflow/260816-extract-love-project.md` - 从 ModelStudio 抽离花海小院、实现无账号定制/发布/分享，并部署到 `love.atimefriend.cn` 的完整实施计划。
 
+`workflow/260817-refine-camera-interior.md` - 依据用户截图调整开局外景机位、室内相框陈列与桌面绣球花，并完成本地门禁和生产发布。
+
 ## 全局重要记忆
 
 - ModelStudio 只作为源副本，不删除或移动其花海小院代码。

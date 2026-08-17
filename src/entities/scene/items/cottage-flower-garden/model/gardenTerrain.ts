@@ -246,6 +246,7 @@ export function createCottageGardenTerrainMeshData(
 
 export const COTTAGE_FLOWER_GARDEN_FIRST_PERSON: FirstPersonConfig = {
   spawn: [...COTTAGE_FLOWER_GARDEN_LAYOUT.visitor.spawn],
+  initialTarget: [...COTTAGE_FLOWER_GARDEN_LAYOUT.visitor.initialTarget],
   eyeHeight: COTTAGE_FLOWER_GARDEN_LAYOUT.visitor.eyeHeight,
   bounds: {
     minX: -60,

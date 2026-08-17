@@ -102,6 +102,17 @@ describe("花海小院阶段一空间骨架", () => {
     assert.equal(mainPath.length, 18.25 - COTTAGE_ARCHITECTURE_MEASUREMENTS.stepFrontZ);
     assert.equal(visitor.eyeHeight, 1.42);
     assert.equal(visitor.spawn[1], visitor.eyeHeight);
+    assert.ok(visitor.spawn[0] < -garden.width / 2);
+    assert.ok(visitor.spawn[2] > garden.length / 2);
+    assert.ok(visitor.initialTarget[0] > visitor.spawn[0]);
+    assert.ok(visitor.initialTarget[2] < visitor.spawn[2]);
+    assert.equal(
+      isCottageFlowerGardenWalkable({
+        x: visitor.spawn[0],
+        z: visitor.spawn[2],
+      }),
+      true,
+    );
   });
 
   it("以主路为轴对称布置两侧花田，并让主路抵达小屋正面", () => {

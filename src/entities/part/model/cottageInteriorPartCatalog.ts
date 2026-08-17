@@ -66,9 +66,10 @@ export const cottageInteriorPartCatalogEntries = [
     stage: '#201812',
     parameters: [
       { id: 'mount', type: 'enum', label: '安装方式', description: '选择墙挂背板或桌面支架。', group: '结构', default: 'wall', options: [{ value: 'wall', label: '墙挂' }, { value: 'table', label: '桌放' }] },
-      { id: 'width', type: 'number', label: '相框宽度', description: '相框整体宽度。', group: '尺寸', unit: 'mm', min: 240, max: 900, step: 10, default: 520 },
-      { id: 'height', type: 'number', label: '相框高度', description: '相框整体高度。', group: '尺寸', unit: 'mm', min: 240, max: 800, step: 10, default: 400 },
-      { id: 'matWidth', type: 'number', label: '卡纸边宽', description: '照片与木框之间的卡纸宽度。', group: '结构', unit: 'mm', min: 12, max: 40, step: 2, default: 32 },
+      { id: 'width', type: 'number', label: '相框宽度', description: '相框整体宽度。', group: '尺寸', unit: 'mm', min: 240, max: 1200, step: 10, default: 520 },
+      { id: 'height', type: 'number', label: '相框高度', description: '相框整体高度。', group: '尺寸', unit: 'mm', min: 240, max: 900, step: 10, default: 400 },
+      { id: 'frameRailWidth', type: 'number', label: '木框边宽', description: '木质边框宽度，大图建议使用较细边框。', group: '结构', unit: 'mm', min: 12, max: 50, step: 2, default: 24 },
+      { id: 'matWidth', type: 'number', label: '卡纸边宽', description: '照片与木框之间的卡纸宽度，可设为零让大图尽量铺满。', group: '结构', unit: 'mm', min: 0, max: 40, step: 2, default: 16 },
       { id: 'frameColor', type: 'color', label: '木框颜色', description: '相框木质边框颜色。', group: '外观', default: '#8A5835' },
     ],
   },

@@ -64,7 +64,7 @@ function TableHydrangea({
     <group
       name={occurrence.id}
       position={occurrence.position}
-      rotation={[0, occurrence.rotationY, 0]}
+      rotation={occurrence.rotation}
       scale={occurrence.scale}
       userData={{
         semanticId: occurrence.id,

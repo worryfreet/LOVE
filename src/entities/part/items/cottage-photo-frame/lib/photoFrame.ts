@@ -8,6 +8,8 @@ export interface CottagePhotoFrameSpecInput {
   readonly height: number
   /** 卡纸边宽，单位：米。 */
   readonly matWidth: number
+  /** 可选木框边宽，单位：米；缺省时按相框短边自动计算。 */
+  readonly frameRailWidth?: number
 }
 
 export interface CottagePhotoFrameSpec extends CottagePhotoFrameSpecInput {
@@ -71,7 +73,17 @@ export function resolveCottagePhotoFrameSpec(
   }
 
   const shortSide = Math.min(input.width, input.height)
-  const frameRailWidth = Math.min(0.055, Math.max(0.018, shortSide * 0.105))
+  const automaticFrameRailWidth = Math.min(
+    0.055,
+    Math.max(0.018, shortSide * 0.105),
+  )
+  const frameRailWidth = input.frameRailWidth ?? automaticFrameRailWidth
+  requireFiniteInRange(
+    '木框边宽',
+    frameRailWidth,
+    0.012,
+    Math.min(0.06, shortSide * 0.22),
+  )
   const maxMatWidth = Math.max(0, shortSide * 0.28 - frameRailWidth)
   requireFiniteInRange('卡纸边宽', input.matWidth, 0, maxMatWidth)
 
