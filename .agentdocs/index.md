@@ -23,6 +23,8 @@
 
 `workflow/260816-extract-love-project.md` - 从 ModelStudio 抽离花海小院、实现无账号定制/发布/分享，并部署到 `love.atimefriend.cn` 的完整实施计划。
 
+`workflow/260817-consolidate-master-production.md` - 将 LOVE 全部分支收敛到唯一 `master` 并以该分支完成生产发布；处理分支治理和本次上线时读取。
+
 ## 已完成任务文档
 
 `workflow/done/260817-slow-romantic-walk-sky-deploy.md` - 已完成沉浸模式 18 秒院门至屋门直行、2 米玫瑰开放、繁星流星增强、终幕双层文案防遮挡与生产发布；维护自动剧情或浪漫天空时读取。
