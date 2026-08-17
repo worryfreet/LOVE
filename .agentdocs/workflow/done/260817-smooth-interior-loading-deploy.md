@@ -26,7 +26,7 @@
 - [x] 阶段一：定位根级 `Suspense` 与按门状态延迟挂载室内子树造成的白屏窗口，冻结加载状态方案。
 - [x] 阶段二：实现室内独立边界、首帧握手、全屏加载界面与减弱动画。
 - [x] 阶段三：补充状态机和界面集成测试，完成 `npm run check`（193 项通过、1 项按环境跳过，生产构建成功）。
-- [ ] 阶段四：提交并推送批准版本，通过 Workbench 发布到目标 ECS，验证健康检查与公网域名。
+- [x] 阶段四：提交并推送批准版本，通过 Workbench 发布到目标 ECS，验证健康检查与公网域名。
 
 ## 部署边界
 
@@ -34,3 +34,11 @@
 - 新代码进入 `/srv/love/releases/<git-sha>`，不覆盖历史 release。
 - 切流前保留数据库备份和上一成功 release；失败时把 `/srv/love/current` 切回上一版本。
 - 不读取、不输出服务器 SSH 私钥或生产秘密正文。
+
+## 发布结果
+
+- 2026-08-17 13:10（Asia/Shanghai）发布提交 `d7481044f53f673599049f4089ea2d772701c587`，GitHub 远程分支与服务器 release 均核对为同一 SHA。
+- 切流前备份 `/srv/love/shared/backups/love-20260817T050807Z.dump`，文件大小 16492 字节。
+- 候选容器在 `127.0.0.1:3101` 通过数据库、对象存储与应用健康检查后切流；临时候选容器已清理。
+- `/srv/love/current` 已原子切换到新 release，应用容器、PostgreSQL 均为 healthy，对象存储正常运行；Nginx 配置检查与 reload 成功。
+- 域名 `https://love.atimefriend.cn/` 与 `/api/health` 均通过服务器公网解析地址返回 HTTP 200；上一成功 release `c99897c50a646cf5bb24fa1a8b1a14dae45f81a8` 保留用于回滚。

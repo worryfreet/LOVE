@@ -23,8 +23,6 @@
 
 `workflow/260816-extract-love-project.md` - 从 ModelStudio 抽离花海小院、实现无账号定制/发布/分享，并部署到 `love.atimefriend.cn` 的完整实施计划。
 
-`workflow/260817-smooth-interior-loading-deploy.md` - 修复首次开门加载完整室内时的白屏，以门缝暖光过渡遮挡准备期，并发布生产版本；处理进入小屋加载或本次部署时读取。
-
 ## 已完成任务文档
 
 `workflow/done/260817-refine-camera-interior.md` - 已完成开局右前方全景机位、前墙/右墙与桌面照片编排、三株绣球花自然摆放及生产发布；复核相同场景时读取。
@@ -32,6 +30,8 @@
 `workflow/done/260817-refine-cottage-furnishing.md` - 已完成信件内收、绣球花束重排、暖木书柜替换默认床铺及东墙照片避让；维护室内陈设时读取。
 
 `workflow/done/260817-immersive-romantic-share.md` - 已完成分享页沉浸浪漫与自由享受双模式、63 秒自动镜头、情书珍藏门禁、GPU 玫瑰开放波、流星终幕与原地控制交接；维护分享体验时读取。
+
+`workflow/done/260817-smooth-interior-loading-deploy.md` - 已完成小屋首次打开时的独立 Suspense 边界、epoch 首帧握手、门缝暖光加载幕布与生产发布；维护进入小屋加载或复核本次 release 时读取。
 
 ## 全局重要记忆
 
