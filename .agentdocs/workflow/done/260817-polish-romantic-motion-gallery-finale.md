@@ -51,8 +51,8 @@
 - [x] Wave 2：补齐旧发布配置到图三八联照片墙的迁移。
 - [x] Wave 3：放大星字与流星轨迹范围。
 - [x] Wave 4：补充回归测试并完成项目要求的本地门禁。
-- [ ] Wave 5：提交推送唯一 `master`，通过 Workbench 拉取最新 SHA 并直接部署。
-- [ ] Wave 6：记录发布结果并归档本文档。
+- [x] Wave 5：提交推送唯一 `master`，通过 Workbench 拉取最新 SHA 并直接部署。
+- [x] Wave 6：记录发布结果并归档本文档。
 
 ## 发布与回滚
 
@@ -60,3 +60,12 @@
 - 新 release 从 `origin/master` 拉取并核对本地、远程、服务器 SHA；构建新镜像、迁移和备份后直接更新 `love-app-1`。
 - 保留当前 release 与数据库备份；若正式健康门禁失败，原子切回当前 release 和镜像。
 - 按用户要求不执行额外线上功能测试，只保留部署所需容器与 `/api/health` 检查。
+
+## 实施与发布结果
+
+- 功能提交：`f41feb4fe45966c504a34392ff0d09411cab34f5`，已推送 `origin/master` 并从该提交构建生产镜像。
+- 本地门禁：`npm run lint`、`npm run typecheck`、`npm run test`、`npm run build` 全部通过；测试共 `204` 项，其中 `203` 项通过、`1` 项既有 PostgreSQL 集成测试跳过、`0` 项失败。
+- 生产 release：`/srv/love/releases/f41feb4fe45966c504a34392ff0d09411cab34f5`；容器镜像为 `love:f41feb4fe45966c504a34392ff0d09411cab34f5`。
+- 数据库备份：`/srv/love/shared/backups/love-20260817T100242Z.dump`，大小 `16492` 字节；回滚 release 保留为 `7e88791f9235a08076b35a777e8d2269f32a54fb`。
+- 部署门禁：`love-app-1` 为 `healthy`，`/api/health` 返回数据库与对象存储均为 `ok`。
+- 按用户明确要求，未执行额外浏览器与线上功能测试，由用户在正式地址进行体验验收。

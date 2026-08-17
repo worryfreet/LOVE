@@ -23,9 +23,9 @@
 
 `workflow/260816-extract-love-project.md` - 从 ModelStudio 抽离花海小院、实现无账号定制/发布/分享，并部署到 `love.atimefriend.cn` 的完整实施计划。
 
-`workflow/260817-polish-romantic-motion-gallery-finale.md` - 放慢沉浸花径与双向门户镜头、修复 5m 玫瑰开放和旧配置照片墙迁移，并放大星空短句与流星覆盖；处理本轮体验优化和发布时读取。
-
 ## 已完成任务文档
+
+`workflow/done/260817-polish-romantic-motion-gallery-finale.md` - 已完成 5 米玫瑰开放、慢速铭牌/返程镜头、图三八联照片墙旧配置迁移、两倍星字与扩展流星天区并发布生产；维护本轮浪漫动线与终幕时读取。
 
 `workflow/done/260817-consolidate-master-production.md` - 已将 LOVE 本地、远程和生产环境收敛到唯一 `master`，固化本地提交、远程推送、服务器拉取和直接部署顺序；处理分支与发布治理时读取。
 
